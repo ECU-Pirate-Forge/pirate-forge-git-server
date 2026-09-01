@@ -10,9 +10,13 @@ var configuredStorageRoot = builder.ExecutionContext.IsPublishMode
     ? containerStorageRoot
     : storageRoot;
 
+var migrationWorker = builder.AddProject<Projects.PirateForgeGitServer_Worker>("migrationworker")
+    .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot);
+
 var apiService = builder.AddProject<Projects.PirateForgeGitServer_ApiService>("apiservice")
     .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot)
-    .WithHttpHealthCheck("/health");
+    .WithHttpHealthCheck("/health")
+    .WaitFor(migrationWorker);
 
 var webFrontend = builder.AddProject<Projects.PirateForgeGitServer_Web>("webfrontend")
     .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot)

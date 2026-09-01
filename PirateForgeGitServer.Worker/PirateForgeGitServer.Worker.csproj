@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>370fe72a-6856-4dbd-9ba3-f577f2008d74</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PirateForgeGitServer.ServiceDefaults\PirateForgeGitServer.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\PirateForgeGitServer.Infrastructure\PirateForgeGitServer.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

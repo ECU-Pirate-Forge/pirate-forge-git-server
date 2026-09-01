@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace PirateForgeGitServer.Infrastructure.Persistence;
 
-internal sealed class DatabaseMigrationService(IServiceScopeFactory scopeFactory)
+public sealed class DatabaseMigrationService(IServiceScopeFactory scopeFactory)
     : IHostedService
 {
     public async Task StartAsync(CancellationToken cancellationToken)

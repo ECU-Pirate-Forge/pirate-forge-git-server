@@ -20,7 +20,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        bool runDatabaseMigrations = true)
     {
         services.AddOptions<StorageOptions>()
             .Bind(configuration.GetRequiredSection(StorageOptions.SectionName))
@@ -56,6 +57,11 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<StoragePaths>();
         services.AddHostedService<StorageInitializer>();
+
+        if (runDatabaseMigrations)
+        {
+            services.AddHostedService<DatabaseMigrationService>();
+        }
 
         services.AddDbContextFactory<PirateForgeDbContext>((serviceProvider, options) =>
         {
@@ -151,7 +157,6 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPersonalAccessTokenRepository, PersonalAccessTokenRepository>();
         services.AddScoped<PersonalAccessTokenService>();
         services.AddSingleton(TimeProvider.System);
-        services.AddHostedService<DatabaseMigrationService>();
         services.AddHostedService<IdentityBootstrapService>();
 
         services.AddHealthChecks()

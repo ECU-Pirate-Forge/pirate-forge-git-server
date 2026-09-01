@@ -10,4 +10,5 @@
 	<Project Path="PirateForgeGitServer.ApiService/PirateForgeGitServer.ApiService.csproj" />
 	<Project Path="PirateForgeGitServer.UnitTests/PirateForgeGitServer.UnitTests.csproj" />
 	<Project Path="PirateForgeGitServer.Web/PirateForgeGitServer.Web.csproj" />
+	<Project Path="PirateForgeGitServer.Worker/PirateForgeGitServer.Worker.csproj" />
 </Solution>

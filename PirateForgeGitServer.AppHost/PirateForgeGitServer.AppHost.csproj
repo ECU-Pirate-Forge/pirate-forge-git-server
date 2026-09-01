@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PirateForgeGitServer.ApiService\PirateForgeGitServer.ApiService.csproj" />
     <ProjectReference Include="..\PirateForgeGitServer.Web\PirateForgeGitServer.Web.csproj" />
+    <ProjectReference Include="..\PirateForgeGitServer.Worker\PirateForgeGitServer.Worker.csproj" />
   </ItemGroup>
 
   <ItemGroup>
