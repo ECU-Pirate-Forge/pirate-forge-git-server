@@ -1,8 +1,110 @@
 @import '_content/Microsoft.FluentUI.AspNetCore.Components/css/reboot.css';
 
+:root {
+  --ecu-purple: #592A8A;
+  --ecu-purple-dark: #431d68;
+  --ecu-purple-soft: #f2ebf9;
+  --ecu-gold: #FFB81C;
+  --ecu-gold-dark: #d69805;
+  --ecu-white: #FFFFFF;
+}
+
+.ecu-theme-provider {
+  --colorBrandBackground: var(--ecu-purple);
+  --colorBrandBackground2: var(--ecu-purple-soft);
+  --colorBrandForeground1: var(--ecu-purple);
+  --colorBrandForeground2: var(--ecu-purple-dark);
+  --colorNeutralBackground1: var(--ecu-white);
+  --colorNeutralBackground2: #f8f4fb;
+  --colorNeutralBackground3: #f0e9f7;
+  --colorNeutralForeground1: #1d1725;
+  --colorNeutralForeground2: #4b425b;
+  --colorNeutralForegroundOnBrand: var(--ecu-white);
+  --colorNeutralStroke1: #d8cee9;
+  --colorNeutralStroke2: #c0afd5;
+  --accent-fill-rest: var(--ecu-purple);
+  --accent-fill-hover: var(--ecu-purple-dark);
+  --accent-fill-active: var(--ecu-purple-dark);
+  --accent-foreground-rest: var(--ecu-white);
+  --accent-foreground-hover: var(--ecu-white);
+  --neutral-fill-input: var(--ecu-white);
+  --neutral-fill-layer-rest: var(--ecu-white);
+  --neutral-fill-layer-hover: #f8f4fb;
+  --neutral-foreground-rest: #1d1725;
+  --neutral-stroke-rest: #d8cee9;
+}
+
 #main-menu {
   padding-top: 12px;
   height: 100%;
+}
+
+.ecu-app-shell {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--ecu-white) 0%, #f5f1fb 100%);
+}
+
+.ecu-header {
+  background: var(--ecu-purple);
+  color: var(--ecu-white);
+  min-height: 64px;
+  padding: 0 1rem;
+  border-bottom: 4px solid var(--ecu-gold);
+  box-sizing: border-box;
+}
+
+.ecu-header .ecu-title {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.ecu-header .user-name {
+  color: var(--ecu-gold);
+  font-weight: 600;
+  margin-right: 0.75rem;
+}
+
+.ecu-header fluent-button::part(control),
+.ecu-header .ecu-signout-button::part(control),
+.ecu-header .ecu-signin-link::part(control) {
+  background: var(--ecu-gold);
+  border-color: var(--ecu-gold);
+  color: var(--ecu-purple);
+  font-weight: 700;
+}
+
+.ecu-header .ecu-signin-link {
+  color: var(--ecu-white);
+  font-weight: 600;
+}
+
+.ecu-nav {
+  background: var(--ecu-purple-soft);
+  border-right: 1px solid var(--colorNeutralStroke1);
+}
+
+.ecu-content {
+  background: var(--ecu-white);
+}
+
+.ecu-footer {
+  background: var(--ecu-white);
+  border-top: 3px solid var(--ecu-gold);
+  color: var(--ecu-purple);
+}
+
+.ecu-footer-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 52px;
+  gap: 1rem;
+  padding: 0 1rem;
+}
+
+.ecu-footer-link {
+  color: var(--ecu-purple);
+  font-weight: 600;
 }
 
 .content {
@@ -10,7 +112,6 @@
   align-self: stretch !important;
   width: 100%;
 }
-
 
 #blazor-error-ui {
   background: lightyellow;

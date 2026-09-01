@@ -1,11 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@inject IThemeService ThemeService
 
-<FluentProviders />
+<FluentProviders Class="ecu-theme-provider" />
 
-<FluentLayout>
-    <FluentLayoutItem Area="LayoutArea.Header">
+<FluentLayout Class="ecu-app-shell">
+    <FluentLayoutItem Area="LayoutArea.Header" Class="ecu-header">
         <FluentLayoutHamburger />
-        Pirate Forge Git Server
+        <span class="ecu-title">Pirate Forge Git Server</span>
         <FluentSpacer />
         <AuthorizeView>
             <Authorized Context="authenticationState">
@@ -13,32 +14,32 @@
                 <form method="post" action="/account/logout">
                     <AntiforgeryToken />
                     <input type="hidden" name="ReturnUrl" value="/" />
-                    <FluentButton Type="ButtonType.Submit" Appearance="ButtonAppearance.Outline">
+                    <FluentButton Type="ButtonType.Submit" Appearance="ButtonAppearance.Primary" Class="ecu-signout-button">
                         Sign out
                     </FluentButton>
                 </form>
             </Authorized>
             <NotAuthorized>
-                <FluentLink Href="/login">Sign in</FluentLink>
+                <FluentLink Href="/login" Class="ecu-signin-link">Sign in</FluentLink>
             </NotAuthorized>
         </AuthorizeView>
     </FluentLayoutItem>
-    <FluentLayoutItem Area="LayoutArea.Navigation">
+    <FluentLayoutItem Area="LayoutArea.Navigation" Class="ecu-nav">
         <NavMenu />
     </FluentLayoutItem>
-    <FluentLayoutItem Area="LayoutArea.Content" Class="main">
+    <FluentLayoutItem Area="LayoutArea.Content" Class="main ecu-content">
         <div class="content">
             @Body
         </div>
     </FluentLayoutItem>
 
-    <FluentLayoutItem Area="LayoutArea.Footer">
-        <div style="display: flex">
-            <FluentLink Href="" Target="LinkTarget.Blank">
+    <FluentLayoutItem Area="LayoutArea.Footer" Class="ecu-footer">
+        <div class="ecu-footer-row">
+            <FluentLink Href="" Target="LinkTarget.Blank" Class="ecu-footer-link">
                 Documentation and demos
-                </FluentLink>
+            </FluentLink>
             <FluentSpacer />
-                <FluentLink Href="" Target="LinkTarget.Blank">
+            <FluentLink Href="" Target="LinkTarget.Blank" Class="ecu-footer-link">
                 About Pirate Forge
             </FluentLink>
         </div>
@@ -50,3 +51,16 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await ThemeService.SetThemeAsync(
+            new ThemeSettings("#592A8A", 0.04, 0.12, ThemeMode.Light, false));
+    }
+}
