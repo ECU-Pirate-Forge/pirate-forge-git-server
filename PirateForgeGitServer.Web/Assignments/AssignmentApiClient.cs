@@ -129,6 +129,48 @@ public sealed class AssignmentApiClient(
                     "The assignment API returned an empty response."));
     }
 
+    public async Task<bool> ArchiveSubmissionAsync(
+        Guid courseId,
+        Guid assignmentId,
+        Guid submissionRunId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await SendAsync(
+            HttpMethod.Post,
+            $"/api/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionRunId}/archive",
+            content: null,
+            cancellationToken);
+        if (response.StatusCode is HttpStatusCode.Forbidden
+            or HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+
+        response.EnsureSuccessStatusCode();
+        return true;
+    }
+
+    public async Task<bool> PurgeSubmissionAsync(
+        Guid courseId,
+        Guid assignmentId,
+        Guid submissionRunId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await SendAsync(
+            HttpMethod.Post,
+            $"/api/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionRunId}/purge",
+            content: null,
+            cancellationToken);
+        if (response.StatusCode is HttpStatusCode.Forbidden
+            or HttpStatusCode.NotFound)
+        {
+            return false;
+        }
+
+        response.EnsureSuccessStatusCode();
+        return true;
+    }
+
     public async Task<bool> ProvisionRepositoriesAsync(
         Guid courseId,
         Guid assignmentId,

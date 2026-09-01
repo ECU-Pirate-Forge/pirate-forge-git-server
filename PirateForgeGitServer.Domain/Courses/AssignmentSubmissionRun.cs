@@ -36,6 +36,16 @@ public sealed class AssignmentSubmissionRun
 
     public string ReviewSummary { get; private set; } = string.Empty;
 
+    public string? ArchiveFilePath { get; private set; }
+
+    public DateTimeOffset? ArchivedAt { get; private set; }
+
+    public DateTimeOffset? PurgedAt { get; private set; }
+
+    public bool IsArchived => ArchivedAt is not null;
+
+    public bool IsPurged => PurgedAt is not null;
+
     public IReadOnlyCollection<AssignmentReviewQuestion> Questions => _questions;
 
     public static AssignmentSubmissionRun Create(
@@ -96,6 +106,36 @@ public sealed class AssignmentSubmissionRun
         Status = "Failed";
         Summary = "The grading pipeline failed before completing the review.";
         CompletedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Archive(string archiveFilePath)
+    {
+        if (PurgedAt is not null)
+        {
+            throw new InvalidOperationException(
+                "The submission has already been purged and cannot be archived.");
+        }
+
+        if (string.IsNullOrWhiteSpace(archiveFilePath))
+        {
+            throw new ArgumentException(
+                "The archive file path is required.",
+                nameof(archiveFilePath));
+        }
+
+        ArchiveFilePath = archiveFilePath.Trim();
+        ArchivedAt ??= DateTimeOffset.UtcNow;
+    }
+
+    public void Purge()
+    {
+        if (PurgedAt is not null)
+        {
+            return;
+        }
+
+        PurgedAt = DateTimeOffset.UtcNow;
+        ArchivedAt ??= PurgedAt;
     }
 
     public void AddQuestion(AssignmentReviewQuestion question)

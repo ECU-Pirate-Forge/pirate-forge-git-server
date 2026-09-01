@@ -118,6 +118,77 @@ internal static class AssignmentEndpoints
             });
 
         group.MapGet(
+            "/{assignmentId:guid}/teams",
+            async Task<IResult> (
+                Guid courseId,
+                Guid assignmentId,
+                ClaimsPrincipal principal,
+                AssignmentTeamService teamService,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await teamService.GetForAssignmentAsync(
+                    courseId,
+                    assignmentId,
+                    GetUserId(principal),
+                    principal.IsInRole(ApplicationRoles.Administrator),
+                    cancellationToken);
+                return result.Access switch
+                {
+                    AssignmentTeamAccess.Success => TypedResults.Ok(
+                        result.Teams.Select(ToResponse).ToArray()),
+                    AssignmentTeamAccess.Forbidden => TypedResults.Forbid(),
+                    AssignmentTeamAccess.NotFound => TypedResults.NotFound(),
+                    AssignmentTeamAccess.Invalid => TypedResults.ValidationProblem(
+                        new Dictionary<string, string[]>
+                        {
+                            ["Assignment"] =
+                            [
+                                "This assignment is not a valid group assignment.",
+                            ],
+                        }),
+                    _ => TypedResults.Conflict(),
+                };
+            });
+
+        group.MapPost(
+            "/{assignmentId:guid}/teams",
+            async Task<IResult> (
+                Guid courseId,
+                Guid assignmentId,
+                CreateAssignmentTeamRequest request,
+                ClaimsPrincipal principal,
+                AssignmentTeamService teamService,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await teamService.CreateAsync(
+                    courseId,
+                    assignmentId,
+                    GetUserId(principal),
+                    principal.IsInRole(ApplicationRoles.Administrator),
+                    request.MemberUserIds,
+                    request.TeamName,
+                    cancellationToken);
+                return result.Access switch
+                {
+                    AssignmentTeamAccess.Success => TypedResults.Created(
+                        $"/api/courses/{courseId}/assignments/{assignmentId}/teams/{result.Team!.TeamId}",
+                        ToResponse(result.Team)),
+                    AssignmentTeamAccess.Forbidden => TypedResults.Forbid(),
+                    AssignmentTeamAccess.NotFound => TypedResults.NotFound(),
+                    AssignmentTeamAccess.Invalid => TypedResults.ValidationProblem(
+                        new Dictionary<string, string[]>
+                        {
+                            ["Team"] =
+                            [
+                                result.Error ?? "The selected team is invalid.",
+                            ],
+                        }),
+                    AssignmentTeamAccess.Conflict => TypedResults.Conflict(),
+                    _ => TypedResults.Conflict(),
+                };
+            });
+
+        group.MapGet(
             "/{assignmentId:guid}/status",
             async Task<IResult> (
                 Guid courseId,
@@ -166,6 +237,68 @@ internal static class AssignmentEndpoints
                 return result is null
                     ? TypedResults.NotFound()
                     : TypedResults.Ok(ToSubmissionResponse(result));
+            });
+
+        group.MapGet(
+            "/{assignmentId:guid}/submissions/archived",
+            async Task<IResult> (
+                Guid courseId,
+                Guid assignmentId,
+                ClaimsPrincipal principal,
+                AssignmentSubmissionService submissionService,
+                CancellationToken cancellationToken) =>
+            {
+                var results = await submissionService.ListArchivedAsync(
+                    courseId,
+                    assignmentId,
+                    GetUserId(principal),
+                    principal.IsInRole(ApplicationRoles.Administrator),
+                    cancellationToken);
+                return TypedResults.Ok(results.Select(ToSubmissionResponse));
+            });
+
+        group.MapPost(
+            "/{assignmentId:guid}/submissions/{submissionId:guid}/archive",
+            async Task<IResult> (
+                Guid courseId,
+                Guid assignmentId,
+                Guid submissionId,
+                ClaimsPrincipal principal,
+                AssignmentSubmissionService submissionService,
+                CancellationToken cancellationToken) =>
+            {
+                var archived = await submissionService.ArchiveAsync(
+                    courseId,
+                    assignmentId,
+                    submissionId,
+                    GetUserId(principal),
+                    principal.IsInRole(ApplicationRoles.Administrator),
+                    cancellationToken);
+                return archived
+                    ? TypedResults.NoContent()
+                    : TypedResults.NotFound();
+            });
+
+        group.MapPost(
+            "/{assignmentId:guid}/submissions/{submissionId:guid}/purge",
+            async Task<IResult> (
+                Guid courseId,
+                Guid assignmentId,
+                Guid submissionId,
+                ClaimsPrincipal principal,
+                AssignmentSubmissionService submissionService,
+                CancellationToken cancellationToken) =>
+            {
+                var purged = await submissionService.PurgeAsync(
+                    courseId,
+                    assignmentId,
+                    submissionId,
+                    GetUserId(principal),
+                    principal.IsInRole(ApplicationRoles.Administrator),
+                    cancellationToken);
+                return purged
+                    ? TypedResults.NoContent()
+                    : TypedResults.NotFound();
             });
 
         group.MapPost(
@@ -322,6 +455,38 @@ internal static class AssignmentEndpoints
                     view.LatestCommit.AuthorName,
                     view.LatestCommit.AuthorEmail,
                     view.LatestCommit.AuthoredAt));
+
+    private static AssignmentTeamResponse ToResponse(
+        AssignmentTeamView view) =>
+        new(
+            view.TeamId,
+            view.AssignmentId,
+            view.Name,
+            view.RepositoryName,
+            view.RepositoryDisplayName,
+            view.Members.Select(ToResponse).ToArray(),
+            view.Contributions.Select(ToResponse).ToArray());
+
+    private static AssignmentTeamMemberResponse ToResponse(
+        AssignmentTeamMemberView view) =>
+        new(
+            view.UserId,
+            view.DisplayName,
+            view.Email,
+            view.JoinedAt);
+
+    private static AssignmentTeamContributionResponse ToResponse(
+        AssignmentTeamContributionView view) =>
+        new(
+            view.UserId,
+            view.DisplayName,
+            view.BranchCount,
+            view.CommitCount,
+            view.DocumentationCommitCount,
+            view.UnitTestCommitCount,
+            view.ImplementationCommitCount,
+            view.LastContributionAt,
+            view.UpdatedAt);
 
     private static AssignmentSubmissionResponse ToSubmissionResponse(
         Domain.Courses.AssignmentSubmissionRun run) =>

@@ -149,6 +149,9 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("AllowTeamChanges")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("AskUnderstandingQuestions")
                         .HasColumnType("INTEGER");
 
@@ -175,10 +178,22 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
                     b.Property<string>("GradingCommand")
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsGroupAssignment")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LocalAiModel")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("MaxScore")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("MaxTeamSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("MinTeamSize")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("RequireTeamSelection")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("ReviewPrompt")
@@ -282,6 +297,12 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ArchiveFilePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("ArchivedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("AssessmentLog")
                         .IsRequired()
                         .HasMaxLength(8000)
@@ -308,6 +329,9 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
 
                     b.Property<int>("MaxScore")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("PurgedAt")
+                        .HasColumnType("TEXT");
 
                     b.Property<Guid>("RepositoryId")
                         .HasColumnType("TEXT");
@@ -342,6 +366,97 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
                     b.HasIndex("AssignmentId", "StudentUserId", "CreatedAt");
 
                     b.ToTable("AssignmentSubmissionRuns", (string)null);
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeam", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("RepositoryId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RepositoryId")
+                        .IsUnique();
+
+                    b.HasIndex("AssignmentId", "Name")
+                        .IsUnique();
+
+                    b.ToTable("AssignmentTeams", (string)null);
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeamContribution", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BranchCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CommitCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("DocumentationCommitCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ImplementationCommitCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset?>("LastContributionAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UnitTestCommitCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("TeamId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("AssignmentTeamContributions", (string)null);
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeamMember", b =>
+                {
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("JoinedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TeamId", "UserId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AssignmentTeamMembers", (string)null);
                 });
 
             modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.Course", b =>
@@ -710,6 +825,51 @@ namespace PirateForgeGitServer.Infrastructure.Persistence.Migrations
                     b.HasOne("PirateForgeGitServer.Infrastructure.Identity.PirateForgeUser", null)
                         .WithMany()
                         .HasForeignKey("StudentUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeam", b =>
+                {
+                    b.HasOne("PirateForgeGitServer.Domain.Courses.Assignment", null)
+                        .WithMany()
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PirateForgeGitServer.Domain.Git.GitRepository", null)
+                        .WithMany()
+                        .HasForeignKey("RepositoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeamContribution", b =>
+                {
+                    b.HasOne("PirateForgeGitServer.Domain.Courses.AssignmentTeam", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PirateForgeGitServer.Infrastructure.Identity.PirateForgeUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PirateForgeGitServer.Domain.Courses.AssignmentTeamMember", b =>
+                {
+                    b.HasOne("PirateForgeGitServer.Domain.Courses.AssignmentTeam", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PirateForgeGitServer.Infrastructure.Identity.PirateForgeUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

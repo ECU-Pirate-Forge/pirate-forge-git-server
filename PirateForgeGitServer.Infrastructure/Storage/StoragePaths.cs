@@ -14,6 +14,8 @@ public sealed class StoragePaths(IOptions<StorageOptions> options)
 
     public string DownloadsPath => Path.Combine(RootPath, "downloads");
 
+    public string SubmissionArchivesPath => Path.Combine(RootPath, "submission-archives");
+
     public string DataProtectionKeysPath => Path.Combine(RootPath, "data-protection-keys");
 
     public IReadOnlyList<string> Directories =>
@@ -22,6 +24,7 @@ public sealed class StoragePaths(IOptions<StorageOptions> options)
         DatabaseDirectory,
         RepositoriesPath,
         DownloadsPath,
+        SubmissionArchivesPath,
         DataProtectionKeysPath
     ];
 

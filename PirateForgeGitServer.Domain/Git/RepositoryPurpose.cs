@@ -5,4 +5,5 @@ public enum RepositoryPurpose
     Standard,
     Template,
     StudentAssignment,
+    TeamAssignment,
 }

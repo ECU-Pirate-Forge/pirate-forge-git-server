@@ -21,6 +21,14 @@ public sealed class PirateForgeDbContext(DbContextOptions<PirateForgeDbContext> 
 
     public DbSet<Assignment> Assignments => Set<Assignment>();
 
+    public DbSet<AssignmentTeam> AssignmentTeams => Set<AssignmentTeam>();
+
+    public DbSet<AssignmentTeamMember> AssignmentTeamMembers =>
+        Set<AssignmentTeamMember>();
+
+    public DbSet<AssignmentTeamContribution> AssignmentTeamContributions =>
+        Set<AssignmentTeamContribution>();
+
     public DbSet<AssignmentRepository> AssignmentRepositories =>
         Set<AssignmentRepository>();
 
@@ -116,6 +124,54 @@ public sealed class PirateForgeDbContext(DbContextOptions<PirateForgeDbContext> 
             assignment.HasOne<PirateForgeUser>()
                 .WithMany()
                 .HasForeignKey(value => value.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AssignmentTeam>(team =>
+        {
+            team.ToTable("AssignmentTeams");
+            team.HasKey(value => value.Id);
+            team.HasIndex(value => new { value.AssignmentId, value.Name })
+                .IsUnique();
+            team.HasIndex(value => value.RepositoryId).IsUnique();
+            team.HasOne<Assignment>()
+                .WithMany()
+                .HasForeignKey(value => value.AssignmentId)
+                .OnDelete(DeleteBehavior.Cascade);
+            team.HasOne<GitRepository>()
+                .WithMany()
+                .HasForeignKey(value => value.RepositoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AssignmentTeamMember>(teamMember =>
+        {
+            teamMember.ToTable("AssignmentTeamMembers");
+            teamMember.HasKey(value => new { value.TeamId, value.UserId });
+            teamMember.HasIndex(value => value.UserId);
+            teamMember.HasOne<AssignmentTeam>()
+                .WithMany()
+                .HasForeignKey(value => value.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+            teamMember.HasOne<PirateForgeUser>()
+                .WithMany()
+                .HasForeignKey(value => value.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<AssignmentTeamContribution>(contribution =>
+        {
+            contribution.ToTable("AssignmentTeamContributions");
+            contribution.HasKey(value => value.Id);
+            contribution.HasIndex(value => new { value.TeamId, value.UserId })
+                .IsUnique();
+            contribution.HasOne<AssignmentTeam>()
+                .WithMany()
+                .HasForeignKey(value => value.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
+            contribution.HasOne<PirateForgeUser>()
+                .WithMany()
+                .HasForeignKey(value => value.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
         });
 

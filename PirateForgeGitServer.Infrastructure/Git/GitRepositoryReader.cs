@@ -229,12 +229,15 @@ public static class GitRepositoryReader
         CancellationToken cancellationToken)
     {
         var normalizedBranch = NormalizeBranch(branch);
+        var treeish = LooksLikeCommitish(normalizedBranch)
+            ? normalizedBranch
+            : $"refs/heads/{normalizedBranch}";
         return GitProcessRunner.ExecuteBytesAsync(
             [
                 $"--git-dir={repositoryPath}",
                 "archive",
                 "--format=zip",
-                $"refs/heads/{normalizedBranch}",
+                treeish,
             ],
             cancellationToken);
     }
@@ -246,6 +249,16 @@ public static class GitRepositoryReader
         return string.IsNullOrEmpty(normalizedPath)
             ? $"refs/heads/{normalizedBranch}"
             : $"refs/heads/{normalizedBranch}:{normalizedPath}";
+    }
+
+    private static bool LooksLikeCommitish(string value)
+    {
+        if (value.Length is < 7 or > 40)
+        {
+            return false;
+        }
+
+        return value.All(Uri.IsHexDigit);
     }
 
     private static string GetLanguage(string path) =>

@@ -149,6 +149,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<CourseAssignmentService>();
         services.AddScoped<AssignmentProvisioningService>();
         services.AddScoped<AssignmentStatusService>();
+        services.AddScoped<AssignmentTeamService>();
         services.AddScoped<CourseAuditService>();
         services.AddScoped<AssignmentArchiveService>();
         services.AddScoped<AssignmentSubmissionService>();
