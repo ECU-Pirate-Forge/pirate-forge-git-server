@@ -1,8 +1,10 @@
 # Single-host Docker deployment
 
-Pirate Forge publishes a Docker Compose model from the Aspire AppHost. The API
-is internal-only. The Web service binds to host loopback and must be published
-through a TLS-terminating reverse proxy on the same host.
+For the overall runtime topology, trust boundaries, and component responsibilities,
+see [`architecture.md`](./architecture.md). Pirate Forge publishes a Docker Compose
+model from the Aspire AppHost. The API is internal-only. The Web service binds to
+host loopback and must be published through a TLS-terminating reverse proxy on
+the same host.
 
 ## Prerequisites
 
