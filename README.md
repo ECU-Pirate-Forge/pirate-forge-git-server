@@ -3,6 +3,46 @@
 Pirate Forge is a .NET 10 and Aspire application for hosting private classroom
 Git repositories.
 
+## System architecture
+
+The repository follows a small, layered runtime model orchestrated by
+`PirateForgeGitServer.AppHost`:
+
+- `PirateForgeGitServer.Web` renders the browser UI and authenticates users
+  through the public web experience.
+- `PirateForgeGitServer.ApiService` hosts the JSON APIs, authorization rules,
+  Git smart HTTP endpoints, and the repository access layer.
+- `PirateForgeGitServer.Worker` performs startup and migration work before the
+  API becomes ready for traffic.
+- `PirateForgeGitServer.Infrastructure` owns SQLite persistence and repository
+  filesystem access.
+
+```mermaid
+flowchart LR
+    User[Browser user or Git client] --> Web[Web frontend\nFluent UI Blazor]
+    User --> Git[Git smart HTTP client]
+
+    Web --> API[API service\nMinimal APIs + Git endpoints]
+    Git --> API
+
+    API --> DB[(SQLite metadata store)]
+    API --> Repos[Bare Git repositories]
+    API --> Downloads[ZIP downloads and audit artifacts]
+    API --> Keys[Data Protection keys]
+
+    Worker[Migration worker] --> DB
+    Worker --> Repos
+```
+
+This is a trust-boundary-first design: the API is the only process that touches
+SQLite metadata and repository storage. The web app communicates through the API
+boundary rather than owning storage access directly. The same pattern extends to
+Git traffic, where smart HTTP requests are authorized and validated before the
+service invokes Git commands against a repository path.
+
+See [`docs/architecture.md`](docs/architecture.md) for a dedicated overview of the
+runtime topology, trust boundaries, and deployment model.
+
 ## Solution structure
 
 - `PirateForgeGitServer.AppHost` orchestrates the application with Aspire.
