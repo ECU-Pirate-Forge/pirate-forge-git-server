@@ -1,0 +1,40 @@
+- generic [ref=f3e3]:
+  - generic [ref=f3e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f3e5]: admin@pirateforge.local
+    - generic [ref=f3e6]: Sign out
+  - navigation [ref=f3e10]:
+    - link "Home" [ref=f3e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f3e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f3e13] [cursor=pointer]:
+      - /url: /courses
+  - generic [ref=f3e15]:
+    - heading "Courses" [active] [level=1] [ref=f3e16]
+    - paragraph [ref=f3e17]: Create and manage the courses available to you.
+    - group [ref=f3e18]:
+      - heading "Create a course" [level=2] [ref=f3e19]
+      - generic [ref=f3e20]:
+        - generic [ref=f3e21]:
+          - generic: Course code
+          - generic "Course code" [ref=f3e23]:
+            - textbox [ref=f3e25]
+        - generic [ref=f3e26]:
+          - generic: Course name
+          - generic "Course name" [ref=f3e28]:
+            - textbox [ref=f3e30]
+        - generic [ref=f3e31] [cursor=pointer]: Create course
+    - group [ref=f3e34]:
+      - paragraph [ref=f3e35]:
+        - strong [ref=f3e36]: TEST101
+      - heading [level=2] [ref=f3e37]:
+        - generic [ref=f3e38] [cursor=pointer]:
+          - generic:
+            - text: Runtime Validation Course
+            - link [ref=f3e39]:
+              - /url: /courses/fb11a994-f282-4360-a81c-15e9798bf8de
+      - paragraph [ref=f3e40]: 1 staff member(s)
+  - generic [ref=f3e42]:
+    - generic [ref=f3e43] [cursor=pointer]: Documentation and demos
+    - generic [ref=f3e46] [cursor=pointer]: About Pirate Forge

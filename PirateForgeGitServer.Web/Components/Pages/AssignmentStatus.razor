@@ -1,0 +1,47 @@
+@page "/courses/{CourseId:guid}/assignments/{AssignmentId:guid}"
+@page "/courses/{CourseId:guid}/assignments/{AssignmentId:guid}/repositories"
+@page "/courses/{CourseId:guid}/assignments/{AssignmentId:guid}/status"
+@attribute [Authorize(Roles = "Administrator,Instructor,TA")]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Courses
+@using PirateForgeGitServer.Web.Assignments
+@using PirateForgeGitServer.Web.Components.Assignments
+@inject AssignmentApiClient AssignmentApi
+
+<PageTitle>@(status?.Title ?? "Assignment") · Status</PageTitle>
+
+@if (status is null)
+{
+    <h1>Assignment status not found</h1>
+    <FluentMessageBar Intent="MessageBarIntent.Warning">
+        The assignment does not exist or is not available to your account.
+    </FluentMessageBar>
+}
+else
+{
+    <p>
+        <FluentLink Href="@($"/courses/{CourseId}")">Course</FluentLink>
+        / @status.Slug
+    </p>
+    <h1>@status.Title repositories</h1>
+    <p>
+        <FluentButton Appearance="ButtonAppearance.Primary"
+                      Href="@($"/courses/{CourseId}/assignments/{AssignmentId}/download")">
+            Download all repositories
+        </FluentButton>
+    </p>
+    <AssignmentStatusTable Status="@status" />
+}
+
+@code {
+    [Parameter] public Guid CourseId { get; set; }
+
+    [Parameter] public Guid AssignmentId { get; set; }
+
+    private AssignmentStatusResponse? status;
+
+    protected override async Task OnInitializedAsync()
+    {
+        status = await AssignmentApi.GetStatusAsync(CourseId, AssignmentId);
+    }
+}

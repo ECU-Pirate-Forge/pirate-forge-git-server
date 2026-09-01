@@ -1,0 +1,35 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <h2>Add course staff</h2>
+    @if (Candidates.Count == 0)
+    {
+        <p>No unassigned Instructor or TA accounts are available.</p>
+    }
+    else
+    {
+        <form method="post"
+              action="@($"/courses/{CourseId}/staff")"
+              class="course-form">
+            <AntiforgeryToken />
+            <label for="staff-selection">Account</label>
+            <select id="staff-selection" name="StaffSelection" required>
+                @foreach (var candidate in Candidates)
+                {
+                    <option value="@($"{candidate.UserId}:{candidate.Role}")">
+                        @candidate.DisplayName (@candidate.Email) · @candidate.Role
+                    </option>
+                }
+            </select>
+            <FluentButton Type="ButtonType.Submit"
+                          Appearance="ButtonAppearance.Primary">
+                Add staff member
+            </FluentButton>
+        </form>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired] public required Guid CourseId { get; set; }
+    [Parameter, EditorRequired] public required IReadOnlyList<CourseStaffCandidateResponse> Candidates { get; set; }
+}

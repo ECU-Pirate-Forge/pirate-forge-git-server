@@ -1,0 +1,35 @@
+- generic [ref=f4e3]:
+  - generic [ref=f4e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f4e5]: admin@pirateforge.local
+    - generic [ref=f4e6]: Sign out
+  - navigation [ref=f4e10]:
+    - link "Home" [ref=f4e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f4e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f4e13] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f4e14] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f4e16]:
+    - heading "Repository Templates" [active] [level=1] [ref=f4e17]
+    - paragraph [ref=f4e18]: Create bare Git repositories that can provide starter code for assignments.
+    - group [ref=f4e19]:
+      - heading "Create template" [level=2] [ref=f4e20]
+      - generic [ref=f4e21]:
+        - generic [ref=f4e22]:
+          - generic: Repository name
+          - generic "Repository name" [ref=f4e24]:
+            - textbox [ref=f4e26]
+        - generic [ref=f4e27]:
+          - generic: Display name
+          - generic "Display name" [ref=f4e29]:
+            - textbox [ref=f4e31]
+        - generic [ref=f4e32] [cursor=pointer]: Create template
+    - generic [ref=f4e34]:
+      - generic [ref=f4e37]: No repository templates are available.
+      - generic "Hide this message" [ref=f4e38] [cursor=pointer]
+  - generic [ref=f4e43]:
+    - generic [ref=f4e44] [cursor=pointer]: Documentation and demos
+    - generic [ref=f4e47] [cursor=pointer]: About Pirate Forge

@@ -1,0 +1,39 @@
+- generic [ref=f14e3]:
+  - generic [ref=f14e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f14e5]: admin@pirateforge.local
+    - generic [ref=f14e6]: Sign out
+  - navigation [ref=f14e10]:
+    - link "Home" [ref=f14e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f14e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f14e13] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f14e14] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f14e16]:
+    - heading "Repositories" [active] [level=1] [ref=f14e17]
+    - paragraph [ref=f14e18]: Browse source code and download repository snapshots.
+    - generic [ref=f14e19]:
+      - group [ref=f14e20]:
+        - heading [level=2] [ref=f14e21]:
+          - generic [ref=f14e22] [cursor=pointer]:
+            - generic:
+              - text: TEST101 Starter
+              - link [ref=f14e23]:
+                - /url: /repositories/test101-starter
+        - code [ref=f14e24]: test101-starter.git
+        - paragraph [ref=f14e25]: Created 8/5/2026
+      - group [ref=f14e26]:
+        - heading [level=2] [ref=f14e27]:
+          - generic [ref=f14e28] [cursor=pointer]:
+            - generic:
+              - text: Week 1 Assignment - Step 8 Runtime Student
+              - link [ref=f14e29]:
+                - /url: /repositories/test101-week-1-63105df23b5043e9b67a55dec2dc53c7
+        - code [ref=f14e30]: test101-week-1-63105df23b5043e9b67a55dec2dc53c7.git
+        - paragraph [ref=f14e31]: Created 8/5/2026
+  - generic [ref=f14e33]:
+    - generic [ref=f14e34] [cursor=pointer]: Documentation and demos
+    - generic [ref=f14e37] [cursor=pointer]: About Pirate Forge

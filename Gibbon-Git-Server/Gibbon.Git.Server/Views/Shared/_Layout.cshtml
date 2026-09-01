@@ -1,0 +1,101 @@
+@using Gibbon.Git.Server.Configuration
+@using Gibbon.Git.Server.Security
+@inject ServerSettings ServerSettings
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="~/favicon.ico?v=2" type="image/x-icon" />
+    <title>
+        @if (!string.IsNullOrEmpty(ViewBag.Title))
+        {
+            @ViewBag.Title <text> ::</text>
+        }
+        @ServerSettings.GetSiteTitle()
+    </title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/css/pure-min.css" />
+        <link rel="stylesheet" href="~/lib/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="~/lib/css/github.css" />
+        <link rel="stylesheet" href="~/css/fonts.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+    <environment include="Production">
+        <link rel="stylesheet" href="~/lib/css/pure-min.css" />
+        <link rel="stylesheet" href="~/lib/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="~/lib/css/github.css" />
+        <link rel="stylesheet" href="~/css/fonts.css" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    </environment>
+    @if (ServerSettings.HasCustomSiteCss())
+    {
+        <link rel="stylesheet" href="@ServerSettings.SiteCssUrl" type="text/css" />
+    }
+    @if (ServerSettings.HasCustomSiteLogo())
+    {
+        <style>
+            .navigation.pure-menu a.pure-menu-heading {
+                background: url('@Url.Content(ServerSettings.SiteLogoUrl)') no-repeat 0 4px;
+            }
+        </style>
+    }
+</head>
+<body class="@ViewContext.RouteData.Values["controller"] @ViewContext.RouteData.Values["action"]">
+    <div class="main">
+        <div class="header">
+            <div class="navigation pure-menu pure-menu-open pure-menu-horizontal">
+                <a class="pure-menu-heading" href="@Url.Action("Index", "Home")">@ServerSettings.GetSiteTitle()</a>
+
+                <ul>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @await Component.InvokeAsync("RepositoryList")
+                        <li><a href="@Url.Action("Index", "Repositories")" class="repository"><i class="fa fa-hdd-o"></i> @Resources.Layout_Repositories</a></li>
+                    }
+                    @if (User.IsInRole(Roles.Admin))
+                    {
+                        <li><a href="@Url.Action("Index", "Users")" class="users"><i class="fa fa-user"></i> @Resources.Layout_AdministrationUsers</a></li>
+                        <li><a href="@Url.Action("Index", "Teams")" class="teams"><i class="fa fa-group"></i> @Resources.Layout_AdministrationTeams</a></li>
+                        <li><a href="@Url.Action("Index", "Server")" class="settings"><i class="fa fa-gears"></i> @Resources.Layout_AdministrationServer</a></li>
+                    }
+                    @await Component.InvokeAsync("UserDisplay")
+                </ul>
+            </div>
+        </div>
+
+        <div class="content" id="@ViewData["PageID"]">
+            @RenderBody()
+        </div>
+
+        <div class="footer">
+            <p>
+                @Resources.Product_Name
+                &bull; &copy; 2024
+                &bull; <a href="http://code-ix.github.io/Gibbon-Git-Server" target="_blank">@Resources.Home</a>
+                &bull; <a href="https://github.com/Code-iX/Gibbon-Git-Server" target="_blank">GitHub</a>
+                @if (User.IsInRole(Roles.Admin))
+                {
+                    <text>&bull;</text> <a href="@Url.Action("Diagnostics", "Home")" class="log">Diagnostics <i class="fa fa-stethoscope"></i></a>
+                }
+            </p>
+        </div>
+    </div>
+    <environment include="Development">
+        <script src="~/lib/js/jquery.js"></script>
+        <script src="~/lib/js/jquery.validate.js"></script>
+        <script src="~/lib/js/jquery.validate.unobtrusive.js"></script>
+        <script src="~/lib/js/highlight.pack.js"></script>
+        <script src="~/js/clipboard.js"></script>
+    </environment>
+    <environment include="Production">
+        <script src="~/lib/js/jquery.min.js"></script>
+        <script src="~/lib/js/jquery.validate.min.js"></script>
+        <script src="~/lib/js/jquery.validate.unobtrusive.min.js"></script>
+        <script src="~/lib/js/highlight.pack.js"></script>
+        <script src="~/js/clipboard.js"></script>
+    </environment>
+    @await RenderSectionAsync("scripts", required: false)
+</body>
+</html>

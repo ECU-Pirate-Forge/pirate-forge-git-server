@@ -1,0 +1,84 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <p>
+        @Status.ProvisionedRepositories of @Status.TotalStudents repositories
+        provisioned.
+    </p>
+
+    @if (Status.Students.Count == 0)
+    {
+        <p>No students are enrolled in this course.</p>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                    <th>Repository</th>
+                    <th>Latest commit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Status.Students)
+                {
+                    <tr>
+                        <td>
+                            <strong>@student.StudentDisplayName</strong><br />
+                            @student.StudentEmail
+                        </td>
+                        <td>@FormatState(student.State)</td>
+                        <td>
+                            @if (student.RepositoryName is not null)
+                            {
+                                <FluentLink Href="@($"/repositories/{student.RepositoryName}")">
+                                    @student.RepositoryName
+                                </FluentLink>
+                                @if (student.Branch is not null)
+                                {
+                                    <div>Branch: @student.Branch</div>
+                                }
+                            }
+                            else
+                            {
+                                <span>Not available</span>
+                            }
+                        </td>
+                        <td>
+                            @if (student.LatestCommit is not null)
+                            {
+                                <strong>@student.LatestCommit.Subject</strong>
+                                <div>
+                                    @student.LatestCommit.AuthorName ·
+                                    @student.LatestCommit.AuthoredAt.ToString("g")
+                                </div>
+                                <code>@student.LatestCommit.Id[..Math.Min(8, student.LatestCommit.Id.Length)]</code>
+                            }
+                            else
+                            {
+                                <span>No commits</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required AssignmentStatusResponse Status { get; set; }
+
+    private static string FormatState(string state) =>
+        state switch
+        {
+            "NotProvisioned" => "Not provisioned",
+            "Empty" => "Empty repository",
+            "Active" => "Active",
+            "Unavailable" => "Unavailable",
+            _ => state,
+        };
+}

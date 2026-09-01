@@ -1,0 +1,43 @@
+- generic [ref=f3e3]:
+  - generic [ref=f3e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f3e5]: admin@pirateforge.local
+    - generic [ref=f3e6]: Sign out
+  - navigation [ref=f3e10]:
+    - link "Home" [ref=f3e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f3e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f3e13] [cursor=pointer]:
+      - /url: /courses
+  - generic [ref=f3e15]:
+    - paragraph [ref=f3e16]:
+      - generic [ref=f3e17] [cursor=pointer]:
+        - generic:
+          - text: Courses
+          - link [ref=f3e18]:
+            - /url: /courses
+      - text: / TEST101
+    - heading "Runtime Validation Course" [active] [level=1] [ref=f3e19]
+    - paragraph [ref=f3e20]: TEST101
+    - group [ref=f3e21]:
+      - heading "Course staff" [level=2] [ref=f3e22]
+      - table [ref=f3e23]:
+        - rowgroup [ref=f3e24]:
+          - row [ref=f3e25]:
+            - columnheader "Name" [ref=f3e26]
+            - columnheader "Email" [ref=f3e27]
+            - columnheader "Role" [ref=f3e28]
+            - columnheader [ref=f3e29]
+        - rowgroup [ref=f3e30]:
+          - row [ref=f3e31]:
+            - cell "Pirate Forge Administrator" [ref=f3e32]
+            - cell "admin@pirateforge.local" [ref=f3e33]
+            - cell "Instructor" [ref=f3e34]
+            - cell [ref=f3e35]
+    - group [ref=f3e39]:
+      - heading "Add course staff" [level=2] [ref=f3e40]
+      - paragraph [ref=f3e41]: No unassigned Instructor or TA accounts are available.
+  - generic [ref=f3e43]:
+    - generic [ref=f3e44] [cursor=pointer]: Documentation and demos
+    - generic [ref=f3e47] [cursor=pointer]: About Pirate Forge

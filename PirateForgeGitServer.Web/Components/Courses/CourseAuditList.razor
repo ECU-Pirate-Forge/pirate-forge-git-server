@@ -1,0 +1,43 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <h2>Download activity</h2>
+    @if (Events.Count == 0)
+    {
+        <p>No repository downloads have been recorded.</p>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>When</th>
+                    <th>User</th>
+                    <th>Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var auditEvent in Events)
+                {
+                    <tr>
+                        <td>@auditEvent.CreatedAt.ToString("g")</td>
+                        <td>
+                            @auditEvent.ActorDisplayName<br />
+                            @auditEvent.ActorEmail
+                        </td>
+                        <td>
+                            @(auditEvent.Action == "AssignmentArchiveDownloaded"
+                                ? "All assignment repositories"
+                                : auditEvent.RepositoryName ?? "Repository")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<CourseAuditEventResponse> Events { get; set; }
+}

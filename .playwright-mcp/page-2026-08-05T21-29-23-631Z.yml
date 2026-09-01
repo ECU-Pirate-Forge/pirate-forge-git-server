@@ -1,0 +1,53 @@
+- generic [ref=f18e3]:
+  - generic [ref=f18e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f18e16]: admin@pirateforge.local
+    - generic [ref=f18e17]: Sign out
+  - navigation [ref=f18e20]:
+    - link "Home" [ref=f18e21] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f18e22] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f18e23] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f18e24] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f18e26]:
+    - heading "Courses" [active] [level=1] [ref=f18e55]
+    - paragraph [ref=f18e56]: Create and manage the courses available to you.
+    - group [ref=f18e57]:
+      - heading "Create a course" [level=2] [ref=f18e58]
+      - generic [ref=f18e59]:
+        - generic [ref=f18e60]:
+          - generic: Course code
+          - generic "Course code" [ref=f18e62]:
+            - textbox [ref=f18e64]
+        - generic [ref=f18e65]:
+          - generic: Course name
+          - generic "Course name" [ref=f18e67]:
+            - textbox [ref=f18e69]
+        - generic [ref=f18e70] [cursor=pointer]: Create course
+    - generic [ref=f18e72]:
+      - group [ref=f18e73]:
+        - paragraph [ref=f18e74]:
+          - strong [ref=f18e75]: ECU-CET-SENG-1020
+        - heading [level=2] [ref=f18e76]:
+          - generic [ref=f18e77] [cursor=pointer]:
+            - generic:
+              - text: Data Structures
+              - link [ref=f18e78]:
+                - /url: /courses/f1efbaa6-76da-44cc-8c9b-865495541a75
+        - paragraph [ref=f18e79]: 1 staff member(s)
+      - group [ref=f18e80]:
+        - paragraph [ref=f18e81]:
+          - strong [ref=f18e82]: TEST101
+        - heading [level=2] [ref=f18e83]:
+          - generic [ref=f18e84] [cursor=pointer]:
+            - generic:
+              - text: Runtime Validation Course
+              - link [ref=f18e85]:
+                - /url: /courses/1d3e24b9-560a-4a0b-a584-35886210fbd0
+        - paragraph [ref=f18e86]: 1 staff member(s)
+  - generic [ref=f18e41]:
+    - generic [ref=f18e42] [cursor=pointer]: Documentation and demos
+    - generic [ref=f18e44] [cursor=pointer]: About Pirate Forge

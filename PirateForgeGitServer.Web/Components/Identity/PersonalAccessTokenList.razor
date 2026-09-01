@@ -1,0 +1,69 @@
+@using PirateForgeGitServer.Contracts.Identity
+
+<FluentCard>
+    <h2>Existing tokens</h2>
+    @if (Tokens.Count == 0)
+    {
+        <p>You do not have any personal access tokens.</p>
+    }
+    else
+    {
+        <table class="course-staff-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Prefix</th>
+                    <th>Created</th>
+                    <th>Last used</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var token in Tokens)
+                {
+                    <tr>
+                        <td>@token.Name</td>
+                        <td><code>@token.Prefix</code></td>
+                        <td>@token.CreatedAt.ToLocalTime().ToString("g")</td>
+                        <td>@FormatDate(token.LastUsedAt)</td>
+                        <td>@GetStatus(token)</td>
+                        <td>
+                            @if (CanRevoke(token))
+                            {
+                                <form method="post"
+                                      action="@($"/account/tokens/{token.Id}/revoke")">
+                                    <AntiforgeryToken />
+                                    <FluentButton Type="ButtonType.Submit"
+                                                  Appearance="ButtonAppearance.Outline"
+                                                  Label="@($"Revoke token {token.Name}")">
+                                        Revoke
+                                    </FluentButton>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<PersonalAccessTokenResponse> Tokens { get; set; }
+
+    private static string FormatDate(DateTimeOffset? value) =>
+        value?.ToLocalTime().ToString("g") ?? "Never";
+
+    private static bool CanRevoke(PersonalAccessTokenResponse token) =>
+        token.RevokedAt is null
+        && (token.ExpiresAt is null || token.ExpiresAt > DateTimeOffset.UtcNow);
+
+    private static string GetStatus(PersonalAccessTokenResponse token) =>
+        token.RevokedAt is not null
+            ? "Revoked"
+            : token.ExpiresAt <= DateTimeOffset.UtcNow
+                ? "Expired"
+                : "Active";
+}

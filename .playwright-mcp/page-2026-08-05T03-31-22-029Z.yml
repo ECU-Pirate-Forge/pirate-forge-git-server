@@ -1,0 +1,34 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=e5] [cursor=pointer]:
+      - generic:
+        - text: Sign in
+        - link [ref=e6]:
+          - /url: /login
+  - navigation [ref=e8]:
+    - link "Home" [ref=e9] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=e10] [cursor=pointer]:
+      - /url: /repositories
+  - main [ref=e13]:
+    - region [ref=e14]:
+      - paragraph [ref=e15]: Pirate Forge
+      - heading "Sign in" [active] [level=1] [ref=e16]
+      - paragraph [ref=e17]: Use your Pirate Forge account to continue.
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic: School email
+          - generic "School email" [ref=e21]:
+            - textbox [ref=e23]
+        - generic [ref=e24]:
+          - generic: Password
+          - generic "Password" [ref=e26]:
+            - textbox [ref=e28]
+        - generic [ref=e29]:
+          - checkbox "Keep me signed in on this device" [ref=e30]
+          - text: Keep me signed in on this device
+        - generic [ref=e31] [cursor=pointer]: Sign in
+  - generic [ref=e34]:
+    - generic [ref=e35] [cursor=pointer]: Documentation and demos
+    - generic [ref=e38] [cursor=pointer]: About Pirate Forge

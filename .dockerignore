@@ -1,0 +1,13 @@
+.git
+.github
+.pirateforge
+.vs
+.vscode
+**/bin
+**/obj
+**/.DS_Store
+Bonobo-Git-Server
+Gibbon-Git-Server
+PirateForgeGitServer.ArchitectureTests
+PirateForgeGitServer.IntegrationTests
+PirateForgeGitServer.UnitTests

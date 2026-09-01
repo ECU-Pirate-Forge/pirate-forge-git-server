@@ -1,0 +1,48 @@
+services:
+  webfrontend:
+    image: "${WEBFRONTEND_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      PirateForge__Storage__RootPath: "/var/lib/pirateforge"
+      APISERVICE_HTTP: "http://apiservice:8080"
+      services__apiservice__http__0: "http://apiservice:8080"
+      AllowedHosts: "${ALLOWED_HOSTS}"
+    ports:
+      - "127.0.0.1:${WEB_PORT}:8080"
+    volumes:
+      - type: "bind"
+        target: "/var/lib/pirateforge/data-protection-keys/web"
+        source: "${STORAGE_PATH}/data-protection-keys/web"
+    depends_on:
+      apiservice:
+        condition: "service_started"
+    networks:
+      - "aspire"
+    restart: "unless-stopped"
+  apiservice:
+    image: "${APISERVICE_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      PirateForge__Storage__RootPath: "/var/lib/pirateforge"
+      PirateForge__BootstrapAdmin__Email: "${BOOTSTRAP_ADMIN_EMAIL}"
+      PirateForge__BootstrapAdmin__Password: "${BOOTSTRAP_ADMIN_PASSWORD}"
+      PirateForge__BootstrapAdmin__DisplayName: "${BOOTSTRAP_ADMIN_DISPLAY_NAME}"
+      AllowedHosts: "apiservice;${ALLOWED_HOSTS}"
+    ports:
+      - "127.0.0.1:${GIT_PORT}:8080"
+    expose:
+      - "8080"
+    volumes:
+      - type: "bind"
+        target: "/var/lib/pirateforge"
+        source: "${STORAGE_PATH}"
+    networks:
+      - "aspire"
+    restart: "unless-stopped"
+networks:
+  aspire:
+    driver: "bridge"

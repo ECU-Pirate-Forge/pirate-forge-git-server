@@ -1,0 +1,20 @@
+@using PirateForgeGitServer.Contracts.Git
+
+<FluentCard>
+    <h2>Recent commits</h2>
+    <ol class="commit-list">
+        @foreach (var commit in Commits)
+        {
+            <li>
+                <strong>@commit.Subject</strong>
+                <span>@commit.AuthorName · @commit.AuthoredAt.ToString("g")</span>
+                <code>@commit.Id[..Math.Min(8, commit.Id.Length)]</code>
+            </li>
+        }
+    </ol>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RepositoryCommitResponse> Commits { get; set; }
+}

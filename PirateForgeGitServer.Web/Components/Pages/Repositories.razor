@@ -1,0 +1,119 @@
+@page "/repositories"
+@attribute [Authorize]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Courses
+@using PirateForgeGitServer.Web.Assignments
+@using PirateForgeGitServer.Web.Courses
+@using PirateForgeGitServer.Web.Repositories
+@inject CourseApiClient CourseApi
+@inject AssignmentApiClient AssignmentApi
+@inject RepositoryApiClient RepositoryApi
+
+<PageTitle>Repositories</PageTitle>
+
+<h1>Repositories</h1>
+<p>Browse course work by course and assignment.</p>
+
+@if (courseGroups.Count == 0)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Info">
+        No repositories are available.
+    </FluentMessageBar>
+}
+else
+{
+    @foreach (var courseGroup in courseGroups)
+    {
+        <FluentCard>
+            <h2>
+                <FluentLink Href="@($"/courses/{courseGroup.Course.Id}")">
+                    @courseGroup.Course.Code · @courseGroup.Course.Name
+                </FluentLink>
+            </h2>
+
+            @if (courseGroup.Assignments.Count == 0)
+            {
+                <p>No assignments have been created for this course yet.</p>
+            }
+            else
+            {
+                @foreach (var assignmentGroup in courseGroup.Assignments)
+                {
+                    <article>
+                        <h3>
+                            <FluentLink Href="@($"/courses/{courseGroup.Course.Id}/assignments/{assignmentGroup.Assignment.Id}/repositories")">
+                                @assignmentGroup.Assignment.Title
+                            </FluentLink>
+                        </h3>
+                        <p><code>@assignmentGroup.Assignment.Slug</code></p>
+
+                        @if (assignmentGroup.Repositories.Count == 0)
+                        {
+                            <p>No student repositories have been provisioned for this assignment yet.</p>
+                        }
+                        else
+                        {
+                            <ul>
+                                @foreach (var repository in assignmentGroup.Repositories)
+                                {
+                                    <li>
+                                        <FluentLink Href="@($"/repositories/{repository.RepositoryName}")">
+                                            @repository.DisplayName
+                                        </FluentLink>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </article>
+                }
+            }
+        </FluentCard>
+    }
+}
+
+@code {
+    private IReadOnlyList<CourseRepositoryGroup> courseGroups = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var courses = await CourseApi.ListAsync();
+        var repositories = await RepositoryApi.ListAsync();
+        var groups = new List<CourseRepositoryGroup>();
+
+        foreach (var course in courses)
+        {
+            var assignments = await AssignmentApi.ListAssignmentsAsync(course.Id);
+            var assignmentGroups = new List<AssignmentRepositoryGroup>();
+
+            foreach (var assignment in assignments)
+            {
+                var prefix = $"{course.Code.Trim().ToLowerInvariant()}-{assignment.Slug.Trim().ToLowerInvariant()}-";
+                var matchingRepositories = repositories
+                    .Where(repository => repository.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    .Select(repository => new StudentRepositoryDetails(
+                        repository.Name,
+                        repository.DisplayName))
+                    .OrderBy(repository => repository.DisplayName, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                assignmentGroups.Add(new AssignmentRepositoryGroup(assignment, matchingRepositories));
+            }
+
+            groups.Add(new CourseRepositoryGroup(course, assignmentGroups));
+        }
+
+        courseGroups = groups;
+    }
+
+    private sealed record CourseRepositoryGroup(
+        CourseResponse Course,
+        IReadOnlyList<AssignmentRepositoryGroup> Assignments);
+
+    private sealed record AssignmentRepositoryGroup(
+        AssignmentResponse Assignment,
+        IReadOnlyList<StudentRepositoryDetails> Repositories);
+
+    private sealed record StudentRepositoryDetails(
+        string RepositoryName,
+        string DisplayName);
+}

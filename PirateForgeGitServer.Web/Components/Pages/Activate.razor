@@ -1,0 +1,56 @@
+@page "/activate"
+@attribute [ExcludeFromInteractiveRouting]
+
+<PageTitle>Activate account</PageTitle>
+
+<main class="login-shell">
+    <section class="login-card" aria-labelledby="activation-heading">
+        <p class="eyebrow">Pirate Forge</p>
+        <h1 id="activation-heading">Activate your account</h1>
+        <p class="intro">Choose a password to finish setting up your student account.</p>
+
+        @if (Error == "invalid")
+        {
+            <FluentMessageBar Intent="MessageBarIntent.Error">
+                The activation link or password is invalid.
+            </FluentMessageBar>
+        }
+
+        @if (UserId != Guid.Empty && !string.IsNullOrWhiteSpace(Token))
+        {
+            <form method="post" action="/account/activate" class="login-form">
+                <AntiforgeryToken />
+                <input type="hidden" name="UserId" value="@UserId" />
+                <input type="hidden" name="Token" value="@Token" />
+                <FluentTextInput Name="Password"
+                                 Label="Password"
+                                 TextInputType="TextInputType.Password"
+                                 AutoComplete="new-password"
+                                 Required="true"
+                                 Width="100%" />
+                <FluentTextInput Name="ConfirmPassword"
+                                 Label="Confirm password"
+                                 TextInputType="TextInputType.Password"
+                                 AutoComplete="new-password"
+                                 Required="true"
+                                 Width="100%" />
+                <FluentButton Type="ButtonType.Submit"
+                              Appearance="ButtonAppearance.Primary">
+                    Activate account
+                </FluentButton>
+            </form>
+        }
+        else
+        {
+            <FluentMessageBar Intent="MessageBarIntent.Error">
+                This activation link is incomplete.
+            </FluentMessageBar>
+        }
+    </section>
+</main>
+
+@code {
+    [SupplyParameterFromQuery] private Guid UserId { get; set; }
+    [SupplyParameterFromQuery] private string? Token { get; set; }
+    [SupplyParameterFromQuery] private string? Error { get; set; }
+}

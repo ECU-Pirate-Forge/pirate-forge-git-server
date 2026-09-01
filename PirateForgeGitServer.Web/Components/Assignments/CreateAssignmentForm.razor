@@ -1,0 +1,69 @@
+@using PirateForgeGitServer.Contracts.Git
+
+<FluentCard>
+    <h2>Create assignment</h2>
+    <form method="post"
+          action="@($"/courses/{CourseId}/assignments/create")"
+          class="course-form">
+        <AntiforgeryToken />
+        <FluentTextInput Name="Slug"
+                         Label="Assignment slug"
+                         Required="true"
+                         Width="100%" />
+        <FluentTextInput Name="Title"
+                         Label="Title"
+                         Required="true"
+                         Width="100%" />
+        <label for="assignment-description">Description</label>
+        <textarea id="assignment-description"
+                  name="Description"
+                  maxlength="4000"></textarea>
+        <label for="assignment-template">Starter code</label>
+        <select id="assignment-template" name="TemplateRepositoryId">
+            <option value="">Blank repository</option>
+            @foreach (var template in Templates)
+            {
+                <option value="@template.Id">@template.DisplayName</option>
+            }
+        </select>
+        <label>
+            <input type="checkbox" name="IsGroupAssignment" value="true" />
+            Group assignment
+        </label>
+        <div>
+            <label for="assignment-min-team-size">Minimum team size</label>
+            <input id="assignment-min-team-size"
+                   name="MinTeamSize"
+                   type="number"
+                   min="2"
+                   value="2" />
+            <label for="assignment-max-team-size">Maximum team size</label>
+            <input id="assignment-max-team-size"
+                   name="MaxTeamSize"
+                   type="number"
+                   min="2"
+                   value="4" />
+            <label>
+                <input type="checkbox" name="RequireTeamSelection" value="true" checked />
+                Require team selection the first time the assignment is accepted
+            </label>
+            <label>
+                <input type="checkbox" name="AllowTeamChanges" value="true" />
+                Allow team changes after the assignment starts
+            </label>
+        </div>
+        <label for="assignment-due">Deadline (optional)</label>
+        <input id="assignment-due" name="DueAt" type="datetime-local" />
+        <FluentButton Type="ButtonType.Submit"
+                      Appearance="ButtonAppearance.Primary">
+            Create assignment
+        </FluentButton>
+    </form>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired] public required Guid CourseId { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RepositoryTemplateResponse> Templates { get; set; }
+}

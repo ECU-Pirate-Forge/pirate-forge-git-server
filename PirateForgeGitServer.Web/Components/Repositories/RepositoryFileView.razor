@@ -1,0 +1,12 @@
+@using PirateForgeGitServer.Contracts.Git
+
+<FluentCard>
+    <h2>@File.Path</h2>
+    <p>@File.Size.ToString("N0") bytes · @File.Language</p>
+    <pre class="file-content"><code>@File.Content</code></pre>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RepositoryFileResponse File { get; set; }
+}

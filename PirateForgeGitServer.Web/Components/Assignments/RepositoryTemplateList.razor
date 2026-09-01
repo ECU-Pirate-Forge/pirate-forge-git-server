@@ -1,0 +1,30 @@
+@using PirateForgeGitServer.Contracts.Git
+
+@if (Templates.Count == 0)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Info">
+        No repository templates are available.
+    </FluentMessageBar>
+}
+else
+{
+    <div class="repository-list">
+        @foreach (var template in Templates)
+        {
+            <FluentCard>
+                <h2>@template.DisplayName</h2>
+                <p><code>@template.Name</code></p>
+                <p>
+                    <FluentLink Href="@($"/repositories/{template.Name}")">
+                        Browse repository
+                    </FluentLink>
+                </p>
+            </FluentCard>
+        }
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RepositoryTemplateResponse> Templates { get; set; }
+}

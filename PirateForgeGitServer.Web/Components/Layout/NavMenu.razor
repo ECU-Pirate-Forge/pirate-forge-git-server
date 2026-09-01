@@ -1,0 +1,11 @@
+﻿<FluentNav Id="main-menu" Width="260px">
+    <FluentNavItem Href="/" Match="NavLinkMatch.All">Home</FluentNavItem>
+    <FluentNavItem Href="/repositories">Repositories</FluentNavItem>
+    <FluentNavItem Href="/courses">Courses</FluentNavItem>
+    <AuthorizeView>
+        <FluentNavItem Href="/account/tokens">Access tokens</FluentNavItem>
+    </AuthorizeView>
+    <AuthorizeView Roles="Administrator,Instructor">
+        <FluentNavItem Href="/templates">Templates</FluentNavItem>
+    </AuthorizeView>
+</FluentNav>

@@ -1,0 +1,22 @@
+- generic [ref=f6e16]:
+  - generic [ref=f6e17]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f6e18]: admin@pirateforge.local
+    - generic [ref=f6e19]: Sign out
+  - navigation [ref=f6e23]:
+    - link "Home" [ref=f6e24] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f6e25] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f6e26] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f6e27] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f6e29]:
+    - heading "test101-starter" [active] [level=1] [ref=f6e30]
+    - generic [ref=f6e31]:
+      - generic [ref=f6e34]: This repository is empty. Push an initial branch before browsing files.
+      - generic "Hide this message" [ref=f6e35] [cursor=pointer]
+  - generic [ref=f6e40]:
+    - generic [ref=f6e41] [cursor=pointer]: Documentation and demos
+    - generic [ref=f6e44] [cursor=pointer]: About Pirate Forge

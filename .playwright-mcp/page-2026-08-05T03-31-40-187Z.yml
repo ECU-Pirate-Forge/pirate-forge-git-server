@@ -1,0 +1,17 @@
+- generic [ref=f1e3]:
+  - generic [ref=f1e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f1e5]: admin@pirateforge.local
+    - generic [ref=f1e6]: Sign out
+  - navigation [ref=f1e10]:
+    - link "Home" [ref=f1e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f1e12] [cursor=pointer]:
+      - /url: /repositories
+  - generic [ref=f1e14]:
+    - heading "Pirate Forge" [active] [level=1] [ref=f1e15]
+    - paragraph [ref=f1e16]: Private Git hosting for courses, assignments, and student work.
+    - generic [ref=f1e17] [cursor=pointer]: Browse repositories
+  - generic [ref=f1e20]:
+    - generic [ref=f1e21] [cursor=pointer]: Documentation and demos
+    - generic [ref=f1e24] [cursor=pointer]: About Pirate Forge

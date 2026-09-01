@@ -1,0 +1,2 @@
+row,email,displayName,status,userId,activationUrl,message
+"2","step8.student@example.edu","Step 8 Runtime Student","Created","63105df2-3b50-43e9-b67a-55dec2dc53c7","https://localhost:7168/activate?userId=63105df2-3b50-43e9-b67a-55dec2dc53c7&token=CfDJ8AISl0oK6xdDoiMHzYxxKvldcjCkeFh7bJ5UHdIydDnL67v%2FVSkIDeVOCbxcQrFmPzgZ%2FwYNUZ3LBSQaHxm3vixx5cgCSdgyaj1THAbTccVrzvz6TB4%2FMjlQehaU0esbnJyBQHiflOOWVZPyGehAkxac0oPjWbTMgjV2HTTALFq6zLDA16kCTLxuzRPTGXXBCuXyjo6N2o1bkWYbisNX0xAzsgpSTr6SYDVSfFzdK39GOWmF85KreO2Dp2TnqO6ZxQ%3D%3D",""

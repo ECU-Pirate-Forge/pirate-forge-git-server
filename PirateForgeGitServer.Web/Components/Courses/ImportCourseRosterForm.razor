@@ -1,0 +1,26 @@
+<FluentCard>
+    <h2>Import students</h2>
+    <p>
+        Upload a CSV file with the header <code>email,displayName</code>.
+        The result downloads as a CSV containing activation links for new accounts.
+    </p>
+    <form method="post"
+          action="@($"/courses/{CourseId}/roster/import")"
+          enctype="multipart/form-data">
+        <AntiforgeryToken />
+        <label for="roster-file">Roster CSV</label>
+        <input id="roster-file"
+               name="RosterFile"
+               type="file"
+               accept=".csv,text/csv"
+               required />
+        <FluentButton Type="ButtonType.Submit"
+                      Appearance="ButtonAppearance.Primary">
+            Import roster
+        </FluentButton>
+    </form>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired] public required Guid CourseId { get; set; }
+}

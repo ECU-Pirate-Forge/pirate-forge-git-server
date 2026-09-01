@@ -1,0 +1,78 @@
+@page "/account/tokens"
+@attribute [Authorize]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Identity
+@using PirateForgeGitServer.Web.Components.Identity
+@inject PersonalAccessTokenApiClient TokenApi
+@inject PersonalAccessTokenFlashStore FlashStore
+@inject IHttpContextAccessor HttpContextAccessor
+
+<PageTitle>Personal Access Tokens</PageTitle>
+
+<h1>Personal access tokens</h1>
+<p>
+    Use a token instead of your account password when Git asks for credentials.
+    Enter your Pirate Forge email as the username.
+</p>
+
+@if (CreatedToken is not null)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Success">
+        <strong>Copy this token now. It will not be shown again.</strong>
+        <div><code>@CreatedToken</code></div>
+    </FluentMessageBar>
+}
+else if (Created)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Warning">
+        The newly created token has already been displayed.
+    </FluentMessageBar>
+}
+
+@if (Revoked)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Success">
+        The personal access token was revoked.
+    </FluentMessageBar>
+}
+else if (Error is not null)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Error">
+        The personal access token operation could not be completed.
+    </FluentMessageBar>
+}
+
+<FluentCard>
+    <h2>Create token</h2>
+    <form method="post" action="/account/tokens/create" class="course-form">
+        <AntiforgeryToken />
+        <FluentTextInput Name="Name"
+                         Label="Token name"
+                         Placeholder="For example, classroom laptop"
+                         Required="true"
+                         Width="100%" />
+        <FluentButton Type="ButtonType.Submit"
+                      Appearance="ButtonAppearance.Primary">
+            Create token
+        </FluentButton>
+    </form>
+</FluentCard>
+
+<PersonalAccessTokenList Tokens="@tokens" />
+
+@code {
+    [SupplyParameterFromQuery] private bool Created { get; set; }
+    [SupplyParameterFromQuery] private bool Revoked { get; set; }
+    [SupplyParameterFromQuery] private string? Error { get; set; }
+    private string? CreatedToken { get; set; }
+    private IReadOnlyList<PersonalAccessTokenResponse> tokens = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var context = HttpContextAccessor.HttpContext
+            ?? throw new InvalidOperationException(
+                "The token page requires an active HTTP request.");
+        CreatedToken = FlashStore.Take(context);
+        tokens = await TokenApi.ListAsync();
+    }
+}

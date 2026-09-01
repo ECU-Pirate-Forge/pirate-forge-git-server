@@ -1,0 +1,47 @@
+- generic [ref=f5e3]:
+  - generic [ref=f5e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f5e5]: admin@pirateforge.local
+    - generic [ref=f5e6]: Sign out
+  - navigation [ref=f5e10]:
+    - link "Home" [ref=f5e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f5e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f5e13] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f5e14] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f5e16]:
+    - heading "Repository Templates" [active] [level=1] [ref=f5e17]
+    - paragraph [ref=f5e18]: Create bare Git repositories that can provide starter code for assignments.
+    - generic [ref=f5e19]:
+      - generic [ref=f5e23]:
+        - text: "Template created. Push starter code with:"
+        - code [ref=f5e24]: git push https://localhost:7168/test101-starter.git main
+      - generic "Hide this message" [ref=f5e25] [cursor=pointer]
+    - group [ref=f5e29]:
+      - heading "Create template" [level=2] [ref=f5e30]
+      - generic [ref=f5e31]:
+        - generic [ref=f5e32]:
+          - generic: Repository name
+          - generic "Repository name" [ref=f5e34]:
+            - textbox [ref=f5e36]
+        - generic [ref=f5e37]:
+          - generic: Display name
+          - generic "Display name" [ref=f5e39]:
+            - textbox [ref=f5e41]
+        - generic [ref=f5e42] [cursor=pointer]: Create template
+    - group [ref=f5e45]:
+      - heading "TEST101 Starter" [level=2] [ref=f5e46]
+      - paragraph [ref=f5e47]:
+        - code [ref=f5e48]: test101-starter
+      - paragraph [ref=f5e49]:
+        - generic [ref=f5e50] [cursor=pointer]:
+          - generic:
+            - text: Browse repository
+            - link [ref=f5e51]:
+              - /url: /repositories/test101-starter
+  - generic [ref=f5e53]:
+    - generic [ref=f5e54] [cursor=pointer]: Documentation and demos
+    - generic [ref=f5e57] [cursor=pointer]: About Pirate Forge

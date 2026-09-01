@@ -1,0 +1,15 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h1>Pirate Forge</h1>
+
+<p>Private Git hosting for courses, assignments, and student work.</p>
+
+<AuthorizeView>
+    <Authorized>
+        <FluentAnchorButton Href="/repositories" Appearance="ButtonAppearance.Primary">
+            Browse repositories
+        </FluentAnchorButton>
+    </Authorized>
+</AuthorizeView>

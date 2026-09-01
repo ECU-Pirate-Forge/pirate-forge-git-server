@@ -1,0 +1,73 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <h2>Assignments</h2>
+    @if (Assignments.Count == 0)
+    {
+        <p>No assignments have been created for this course.</p>
+    }
+    else
+    {
+        <div class="repository-list">
+            @foreach (var assignment in Assignments)
+            {
+                <article>
+                    <h3>
+                        <FluentLink Href="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
+                            @assignment.Title
+                        </FluentLink>
+                    </h3>
+                    <p><code>@assignment.Slug</code></p>
+                    @if (!string.IsNullOrWhiteSpace(assignment.Description))
+                    {
+                        <p>@assignment.Description</p>
+                    }
+                    <p>
+                        Starter:
+                        @(assignment.Template?.DisplayName ?? "Blank repository")
+                    </p>
+                    <p>
+                        Due:
+                        @(assignment.DueAt?.ToString("f") ?? "No deadline")
+                    </p>
+                    <p>
+                        Repositories:
+                        @assignment.ProvisionedRepositoryCount of @assignment.StudentCount
+                    </p>
+                    @if (CanViewStatus)
+                    {
+                        <p>
+                            <FluentLink Href="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
+                                View repositories
+                            </FluentLink>
+                        </p>
+                    }
+                    @if (CanManage
+                        && assignment.ProvisionedRepositoryCount
+                            < assignment.StudentCount)
+                    {
+                        <form method="post"
+                              action="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
+                            <AntiforgeryToken />
+                            <FluentButton Type="ButtonType.Submit"
+                                          Appearance="ButtonAppearance.Primary">
+                                Provision missing repositories
+                            </FluentButton>
+                        </form>
+                    }
+                </article>
+            }
+        </div>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<AssignmentResponse> Assignments { get; set; }
+
+    [Parameter] public Guid CourseId { get; set; }
+
+    [Parameter] public bool CanManage { get; set; }
+
+    [Parameter] public bool CanViewStatus { get; set; }
+}

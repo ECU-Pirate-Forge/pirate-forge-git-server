@@ -1,0 +1,21 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<div class="course-grid">
+    @foreach (var course in Courses)
+    {
+        <FluentCard class="course-card">
+            <p><strong>@course.Code</strong></p>
+            <h2>
+                <FluentLink Href="@($"/courses/{course.Id}")">
+                    @course.Name
+                </FluentLink>
+            </h2>
+            <p>@course.Staff.Count staff member(s)</p>
+        </FluentCard>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<CourseResponse> Courses { get; set; }
+}

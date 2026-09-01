@@ -1,0 +1,32 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <h2>Student Roster</h2>
+    @if (Students.Count == 0)
+    {
+        <p>No students are enrolled in this course.</p>
+    }
+    else
+    {
+        <table class="course-staff-table">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Enrolled</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var student in Students)
+                {
+                    <tr>
+                        <td>@student.DisplayName</td>
+                        <td>@student.Email</td>
+                        <td>@student.EnrolledAt.ToString("d")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<CourseStudentResponse> Students { get; set; }
+}

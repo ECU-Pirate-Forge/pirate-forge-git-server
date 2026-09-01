@@ -1,0 +1,52 @@
+﻿@inherits LayoutComponentBase
+
+<FluentProviders />
+
+<FluentLayout>
+    <FluentLayoutItem Area="LayoutArea.Header">
+        <FluentLayoutHamburger />
+        Pirate Forge Git Server
+        <FluentSpacer />
+        <AuthorizeView>
+            <Authorized Context="authenticationState">
+                <span class="user-name">@authenticationState.User.Identity?.Name</span>
+                <form method="post" action="/account/logout">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="/" />
+                    <FluentButton Type="ButtonType.Submit" Appearance="ButtonAppearance.Outline">
+                        Sign out
+                    </FluentButton>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <FluentLink Href="/login">Sign in</FluentLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </FluentLayoutItem>
+    <FluentLayoutItem Area="LayoutArea.Navigation">
+        <NavMenu />
+    </FluentLayoutItem>
+    <FluentLayoutItem Area="LayoutArea.Content" Class="main">
+        <div class="content">
+            @Body
+        </div>
+    </FluentLayoutItem>
+
+    <FluentLayoutItem Area="LayoutArea.Footer">
+        <div style="display: flex">
+            <FluentLink Href="" Target="LinkTarget.Blank">
+                Documentation and demos
+                </FluentLink>
+            <FluentSpacer />
+                <FluentLink Href="" Target="LinkTarget.Blank">
+                About Pirate Forge
+            </FluentLink>
+        </div>
+    </FluentLayoutItem>
+</FluentLayout>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

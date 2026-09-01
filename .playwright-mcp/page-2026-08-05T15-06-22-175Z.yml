@@ -1,0 +1,35 @@
+- generic [ref=f2e16]:
+  - generic [ref=f2e17]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f2e18]: admin@pirateforge.local
+    - generic [ref=f2e19]: Sign out
+  - navigation [ref=f2e23]:
+    - link "Home" [ref=f2e24] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f2e25] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f2e26] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f2e27] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f2e29]:
+    - heading "Courses" [active] [level=1] [ref=f2e30]
+    - paragraph [ref=f2e31]: Create and manage the courses available to you.
+    - group [ref=f2e32]:
+      - heading "Create a course" [level=2] [ref=f2e33]
+      - generic [ref=f2e34]:
+        - generic [ref=f2e35]:
+          - generic: Course code
+          - generic "Course code" [ref=f2e37]:
+            - textbox [ref=f2e39]
+        - generic [ref=f2e40]:
+          - generic: Course name
+          - generic "Course name" [ref=f2e42]:
+            - textbox [ref=f2e44]
+        - generic [ref=f2e45] [cursor=pointer]: Create course
+    - generic [ref=f2e47]:
+      - generic [ref=f2e50]: No courses are available.
+      - generic "Hide this message" [ref=f2e51] [cursor=pointer]
+  - generic [ref=f2e56]:
+    - generic [ref=f2e57] [cursor=pointer]: Documentation and demos
+    - generic [ref=f2e60] [cursor=pointer]: About Pirate Forge

@@ -1,0 +1,63 @@
+@page "/login"
+@attribute [ExcludeFromInteractiveRouting]
+
+<PageTitle>Sign in</PageTitle>
+
+<main class="login-shell">
+    <section class="login-card" aria-labelledby="login-heading">
+        <p class="eyebrow">Pirate Forge</p>
+        <h1 id="login-heading">Sign in</h1>
+        <p class="intro">Use your Pirate Forge account to continue.</p>
+
+        @if (Error == "invalid-credentials")
+        {
+            <FluentMessageBar Intent="MessageBarIntent.Error">
+                The email or password is incorrect.
+            </FluentMessageBar>
+        }
+
+        @if (Activated)
+        {
+            <FluentMessageBar Intent="MessageBarIntent.Success">
+                Your account is active. You can now sign in.
+            </FluentMessageBar>
+        }
+
+        <form method="post" action="/account/login" class="login-form">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@ReturnUrl" />
+
+            <FluentTextInput Name="Email"
+                             Label="School email"
+                             TextInputType="TextInputType.Email"
+                             AutoComplete="email"
+                             Required="true"
+                             Width="100%" />
+            <FluentTextInput Name="Password"
+                             Label="Password"
+                             TextInputType="TextInputType.Password"
+                             AutoComplete="current-password"
+                             Required="true"
+                             Width="100%" />
+            <label class="remember-me">
+                <input type="checkbox" name="RememberMe" value="true" />
+                Keep me signed in on this device
+            </label>
+            <FluentButton Type="ButtonType.Submit"
+                          Appearance="ButtonAppearance.Primary">
+                Sign in
+            </FluentButton>
+        </form>
+    </section>
+</main>
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? Error { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    [SupplyParameterFromQuery]
+    private bool Activated { get; set; }
+}

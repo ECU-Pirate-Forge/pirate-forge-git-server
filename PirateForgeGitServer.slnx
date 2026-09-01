@@ -1,0 +1,13 @@
+<Solution>
+	<Project Path="PirateForgeGitServer.AppHost/PirateForgeGitServer.AppHost.csproj" />
+	<Project Path="PirateForgeGitServer.Application/PirateForgeGitServer.Application.csproj" />
+	<Project Path="PirateForgeGitServer.ArchitectureTests/PirateForgeGitServer.ArchitectureTests.csproj" />
+	<Project Path="PirateForgeGitServer.Contracts/PirateForgeGitServer.Contracts.csproj" />
+	<Project Path="PirateForgeGitServer.Domain/PirateForgeGitServer.Domain.csproj" />
+	<Project Path="PirateForgeGitServer.Infrastructure/PirateForgeGitServer.Infrastructure.csproj" />
+	<Project Path="PirateForgeGitServer.IntegrationTests/PirateForgeGitServer.IntegrationTests.csproj" />
+	<Project Path="PirateForgeGitServer.ServiceDefaults/PirateForgeGitServer.ServiceDefaults.csproj" />
+	<Project Path="PirateForgeGitServer.ApiService/PirateForgeGitServer.ApiService.csproj" />
+	<Project Path="PirateForgeGitServer.UnitTests/PirateForgeGitServer.UnitTests.csproj" />
+	<Project Path="PirateForgeGitServer.Web/PirateForgeGitServer.Web.csproj" />
+</Solution>

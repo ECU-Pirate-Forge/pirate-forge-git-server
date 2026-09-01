@@ -1,0 +1,107 @@
+- generic [ref=f19e3]:
+  - generic [ref=f19e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f19e5]: admin@pirateforge.local
+    - generic [ref=f19e6]: Sign out
+  - navigation [ref=f19e10]:
+    - link "Home" [ref=f19e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f19e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f19e13] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f19e14] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f19e16]:
+    - paragraph [ref=f19e17]:
+      - generic [ref=f19e18] [cursor=pointer]:
+        - generic:
+          - text: Courses
+          - link [ref=f19e19]:
+            - /url: /courses
+      - text: / TEST101
+    - heading "Runtime Validation Course" [active] [level=1] [ref=f19e20]
+    - paragraph [ref=f19e21]: TEST101
+    - group [ref=f19e22]:
+      - heading "Course staff" [level=2] [ref=f19e23]
+      - table [ref=f19e24]:
+        - rowgroup [ref=f19e25]:
+          - row [ref=f19e26]:
+            - columnheader "Name" [ref=f19e27]
+            - columnheader "Email" [ref=f19e28]
+            - columnheader "Role" [ref=f19e29]
+            - columnheader [ref=f19e30]
+        - rowgroup [ref=f19e31]:
+          - row [ref=f19e32]:
+            - cell "Pirate Forge Administrator" [ref=f19e33]
+            - cell "admin@pirateforge.local" [ref=f19e34]
+            - cell "Instructor" [ref=f19e35]
+            - cell [ref=f19e36]
+    - group [ref=f19e40]:
+      - heading "Assignments" [level=2] [ref=f19e41]
+      - article [ref=f19e43]:
+        - heading "Week 1 Assignment" [level=3] [ref=f19e44]
+        - paragraph [ref=f19e45]:
+          - code [ref=f19e46]: week-1
+        - paragraph [ref=f19e47]: Runtime validation assignment.
+        - paragraph [ref=f19e48]: "Starter: TEST101 Starter"
+        - paragraph [ref=f19e49]: "Due: No deadline"
+        - paragraph [ref=f19e50]: "Repositories: 1 of 1"
+        - paragraph [ref=f19e51]:
+          - generic [ref=f19e52] [cursor=pointer]:
+            - generic:
+              - text: View status
+              - link [ref=f19e53]:
+                - /url: /courses/1d3e24b9-560a-4a0b-a584-35886210fbd0/assignments/b3b1b1a4-4885-4156-9f96-225d85e7006f/status
+    - group [ref=f19e54]:
+      - heading "Create assignment" [level=2] [ref=f19e55]
+      - generic [ref=f19e56]:
+        - generic [ref=f19e57]:
+          - generic: Assignment slug
+          - generic "Assignment slug" [ref=f19e59]:
+            - textbox [ref=f19e61]
+        - generic [ref=f19e62]:
+          - generic: Title
+          - generic "Title" [ref=f19e64]:
+            - textbox [ref=f19e66]
+        - generic [ref=f19e67]: Description
+        - textbox "Description" [ref=f19e68]
+        - generic [ref=f19e69]: Starter code
+        - combobox "Starter code" [ref=f19e70]:
+          - option "Blank repository" [selected]
+          - option "TEST101 Starter"
+        - generic [ref=f19e71]: Deadline (optional)
+        - textbox "Deadline (optional)" [ref=f19e72]
+        - generic [ref=f19e73] [cursor=pointer]: Create assignment
+    - group [ref=f19e75]:
+      - heading "Student Roster" [level=2] [ref=f19e76]
+      - table [ref=f19e77]:
+        - rowgroup [ref=f19e78]:
+          - row [ref=f19e79]:
+            - columnheader "Name" [ref=f19e80]
+            - columnheader "Email" [ref=f19e81]
+            - columnheader "Enrolled" [ref=f19e82]
+        - rowgroup [ref=f19e83]:
+          - row [ref=f19e84]:
+            - cell "Step 8 Runtime Student" [ref=f19e85]
+            - cell "step8.student@example.edu" [ref=f19e86]
+            - cell "8/5/2026" [ref=f19e87]
+    - group [ref=f19e88]:
+      - heading "Import students" [level=2] [ref=f19e89]
+      - paragraph [ref=f19e90]:
+        - text: Upload a CSV file with the header
+        - code [ref=f19e91]: email,displayName
+        - text: . The result downloads as a CSV containing activation links for new accounts.
+      - generic [ref=f19e92]:
+        - generic [ref=f19e93]: Roster CSV
+        - button "Roster CSV" [ref=f19e94]
+        - generic [ref=f19e95] [cursor=pointer]: Import roster
+    - group [ref=f19e97]:
+      - heading "Add course staff" [level=2] [ref=f19e98]
+      - paragraph [ref=f19e99]: No unassigned Instructor or TA accounts are available.
+    - group [ref=f19e100]:
+      - heading "Download activity" [level=2] [ref=f19e101]
+      - paragraph [ref=f19e102]: No repository downloads have been recorded.
+  - generic [ref=f19e104]:
+    - generic [ref=f19e105] [cursor=pointer]: Documentation and demos
+    - generic [ref=f19e108] [cursor=pointer]: About Pirate Forge

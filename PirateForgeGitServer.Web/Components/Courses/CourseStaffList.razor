@@ -1,0 +1,40 @@
+@using PirateForgeGitServer.Contracts.Courses
+
+<FluentCard>
+    <h2>Course staff</h2>
+    <table class="course-staff-table">
+        <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var member in Staff)
+            {
+                <tr>
+                    <td>@member.DisplayName</td>
+                    <td>@member.Email</td>
+                    <td>@member.Role</td>
+                    <td>
+                        @if (CanManage)
+                        {
+                            <form method="post"
+                                  action="@($"/courses/{CourseId}/staff/remove")">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="UserId" value="@member.UserId" />
+                                <FluentButton Type="ButtonType.Submit"
+                                              Appearance="ButtonAppearance.Outline">
+                                    Remove
+                                </FluentButton>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired] public required Guid CourseId { get; set; }
+    [Parameter, EditorRequired] public required IReadOnlyList<CourseStaffResponse> Staff { get; set; }
+    [Parameter] public bool CanManage { get; set; }
+}

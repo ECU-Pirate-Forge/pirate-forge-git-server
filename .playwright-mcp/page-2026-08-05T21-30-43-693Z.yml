@@ -1,0 +1,50 @@
+- generic [ref=f20e3]:
+  - generic [ref=f20e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f20e16]: admin@pirateforge.local
+    - generic [ref=f20e17]: Sign out
+  - navigation [ref=f20e20]:
+    - link "Home" [ref=f20e21] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f20e22] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f20e23] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f20e24] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f20e26]:
+    - paragraph [ref=f20e27]:
+      - generic [ref=f20e52] [cursor=pointer]:
+        - generic:
+          - text: Course
+          - link [ref=f20e53]:
+            - /url: /courses/1d3e24b9-560a-4a0b-a584-35886210fbd0
+      - text: / week-1
+    - heading "Week 1 Assignment status" [level=1] [ref=f20e28]
+    - paragraph [ref=f20e29]:
+      - generic [active] [ref=f20e54] [cursor=pointer]: Download all repositories
+    - group [ref=f20e30]:
+      - paragraph [ref=f20e31]: 1 of 1 repositories provisioned.
+      - table [ref=f20e32]:
+        - rowgroup [ref=f20e33]:
+          - row [ref=f20e34]:
+            - columnheader "Student" [ref=f20e35]
+            - columnheader "Status" [ref=f20e36]
+            - columnheader "Repository" [ref=f20e37]
+            - columnheader "Latest commit" [ref=f20e38]
+        - rowgroup [ref=f20e39]:
+          - row [ref=f20e40]:
+            - cell [ref=f20e41]:
+              - strong [ref=f20e42]: Step 8 Runtime Student
+              - text: step8.student@example.edu
+            - cell "Empty repository" [ref=f20e43]
+            - cell [ref=f20e44]:
+              - generic [ref=f20e56] [cursor=pointer]:
+                - generic:
+                  - text: test101-week-1-63105df23b5043e9b67a55dec2dc53c7
+                  - link [ref=f20e57]:
+                    - /url: /repositories/test101-week-1-63105df23b5043e9b67a55dec2dc53c7
+            - cell "No commits" [ref=f20e45]
+  - generic [ref=f20e47]:
+    - generic [ref=f20e48] [cursor=pointer]: Documentation and demos
+    - generic [ref=f20e50] [cursor=pointer]: About Pirate Forge

@@ -1,0 +1,40 @@
+@using PirateForgeGitServer.Contracts.Git
+
+<nav aria-label="Repository branches">
+    @* <span>Branch:</span>
+    @foreach (var branch in Branches)
+    {
+        <FluentButton Appearance="@(branch.Name == SelectedBranch
+                                      ? ButtonAppearance.Primary
+                                      : ButtonAppearance.Outline)"
+                      Href="@($"/repositories/{RepositoryName}?branch={Uri.EscapeDataString(branch.Name)}")">
+                      
+            @branch.Name
+        </FluentButton>
+    } *@
+
+    <span>Branch:</span>
+    <FluentSelect Label=""
+                TOption="RepositoryBranchResponse"
+                TValue="string"
+                @bind-Value="@SelectedBranch">
+        @foreach (var branch in Branches)
+        {
+            <FluentOption TValue="string" Value="@branch.Name">
+                @branch.Name
+            </FluentOption>
+        }
+    </FluentSelect>
+
+</nav>
+
+@code {
+    [Parameter, EditorRequired]
+    public required string RepositoryName { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RepositoryBranchResponse> Branches { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string SelectedBranch { get; set; }
+}

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>9046f5fe-95d2-42c5-bb6e-d8666f0aca66</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <ProjectReference Include="..\PirateForgeGitServer.ServiceDefaults\PirateForgeGitServer.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\PirateForgeGitServer.Application\PirateForgeGitServer.Application.csproj" />
+    <ProjectReference Include="..\PirateForgeGitServer.Contracts\PirateForgeGitServer.Contracts.csproj" />
+    <ProjectReference Include="..\PirateForgeGitServer.Infrastructure\PirateForgeGitServer.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

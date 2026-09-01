@@ -1,0 +1,59 @@
+@page "/templates"
+@attribute [Authorize(Roles = "Administrator,Instructor")]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Git
+@using PirateForgeGitServer.Web.Assignments
+@using PirateForgeGitServer.Web.Components.Assignments
+@inject AssignmentApiClient AssignmentApi
+@inject NavigationManager Navigation
+
+<PageTitle>Repository Templates</PageTitle>
+
+<h1>Repository Templates</h1>
+<p>Create bare Git repositories that can provide starter code for assignments.</p>
+
+@if (!string.IsNullOrWhiteSpace(Created))
+{
+    <FluentMessageBar Intent="MessageBarIntent.Success">
+        Template created. Push starter code with:
+        <code>git push @($"{Navigation.BaseUri.TrimEnd('/')}/{Created}.git") main</code>
+    </FluentMessageBar>
+}
+else if (Error is not null)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Error">
+        The repository template could not be created.
+    </FluentMessageBar>
+}
+
+<FluentCard>
+    <h2>Create template</h2>
+    <form method="post" action="/templates/create" class="course-form">
+        <AntiforgeryToken />
+        <FluentTextInput Name="Name"
+                         Label="Repository name"
+                         Required="true"
+                         Width="100%" />
+        <FluentTextInput Name="DisplayName"
+                         Label="Display name"
+                         Required="true"
+                         Width="100%" />
+        <FluentButton Type="ButtonType.Submit"
+                      Appearance="ButtonAppearance.Primary">
+            Create template
+        </FluentButton>
+    </form>
+</FluentCard>
+
+<RepositoryTemplateList Templates="@templates" />
+
+@code {
+    [SupplyParameterFromQuery] private string? Created { get; set; }
+    [SupplyParameterFromQuery] private string? Error { get; set; }
+    private IReadOnlyList<RepositoryTemplateResponse> templates = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        templates = await AssignmentApi.ListTemplatesAsync();
+    }
+}

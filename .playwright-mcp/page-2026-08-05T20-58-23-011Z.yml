@@ -1,0 +1,35 @@
+- generic [ref=f15e3]:
+  - generic [ref=f15e4]:
+    - generic [ref=f15e6]:
+      - generic "Close" [ref=f15e7]
+      - navigation [ref=f15e11]:
+        - link "Home" [ref=f15e12] [cursor=pointer]:
+          - /url: /
+        - link "Repositories" [ref=f15e13] [cursor=pointer]:
+          - /url: /repositories
+        - link "Courses" [ref=f15e14] [cursor=pointer]:
+          - /url: /courses
+    - text: Pirate Forge Git Server
+    - generic [ref=f15e15]: Sign in
+  - navigation [ref=f15e17]:
+    - link "Home" [ref=f15e18] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f15e19] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f15e20] [cursor=pointer]:
+      - /url: /courses
+  - main [ref=f15e23]:
+    - region [ref=f15e24]:
+      - paragraph [ref=f15e25]: Pirate Forge
+      - heading "Sign in" [active] [level=1] [ref=f15e26]
+      - paragraph [ref=f15e27]: Use your Pirate Forge account to continue.
+      - generic [ref=f15e28]:
+        - generic [ref=f15e29]: School email
+        - generic [ref=f15e31]: Password
+        - generic [ref=f15e33]:
+          - checkbox "Keep me signed in on this device" [ref=f15e34]
+          - text: Keep me signed in on this device
+        - generic [ref=f15e35] [cursor=pointer]: Sign in
+  - generic [ref=f15e37]:
+    - generic [ref=f15e38]: Documentation and demos
+    - generic [ref=f15e40]: About Pirate Forge

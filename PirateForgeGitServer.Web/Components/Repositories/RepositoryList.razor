@@ -1,0 +1,21 @@
+@using PirateForgeGitServer.Contracts.Git
+
+<div class="repository-grid">
+    @foreach (var repository in Repositories)
+    {
+        <FluentCard class="repository-card">
+            <h2>
+                <FluentLink Href="@($"/repositories/{repository.Name}")">
+                    @repository.DisplayName
+                </FluentLink>
+            </h2>
+            <code>@(repository.Name).git</code>
+            <p>Created @repository.CreatedAt.ToString("d")</p>
+        </FluentCard>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<RepositoryResponse> Repositories { get; set; }
+}

@@ -1,0 +1,44 @@
+.login-shell {
+    display: grid;
+    min-height: calc(100vh - 12rem);
+    place-items: center;
+}
+
+.login-card {
+    background: var(--neutral-layer-1);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 0.75rem;
+    box-shadow: var(--elevation-shadow-card-rest);
+    max-width: 28rem;
+    padding: 2rem;
+    width: 100%;
+}
+
+.eyebrow {
+    color: var(--accent-foreground-rest);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.login-card h1 {
+    margin-bottom: 0.25rem;
+}
+
+.intro {
+    color: var(--neutral-foreground-hint);
+    margin-bottom: 1.5rem;
+}
+
+.login-form {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.remember-me {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+}

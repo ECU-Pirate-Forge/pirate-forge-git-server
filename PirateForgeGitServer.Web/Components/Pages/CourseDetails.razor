@@ -1,0 +1,116 @@
+@page "/courses/{Id:guid}"
+@attribute [Authorize]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Courses
+@using PirateForgeGitServer.Web.Courses
+@using PirateForgeGitServer.Web.Assignments
+@using PirateForgeGitServer.Web.Components.Assignments
+@inject CourseApiClient CourseApi
+@inject AssignmentApiClient AssignmentApi
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>@course?.Code · Course</PageTitle>
+
+@if (course is not null)
+{
+    <p><FluentLink Href="/courses">Courses</FluentLink> / @course.Code</p>
+    <h1>@course.Name</h1>
+    <p>@course.Code</p>
+
+    @if (Error == "invalid-assignment")
+    {
+        <FluentMessageBar Intent="MessageBarIntent.Error">
+            The assignment could not be created. Check its slug, deadline, and starter template.
+        </FluentMessageBar>
+    }
+    else if (Error == "provisioning")
+    {
+        <FluentMessageBar Intent="MessageBarIntent.Error">
+            The missing student repositories could not be provisioned. Try again.
+        </FluentMessageBar>
+    }
+    else if (Error is not null)
+    {
+        <FluentMessageBar Intent="MessageBarIntent.Error">
+            The staff change could not be completed.
+        </FluentMessageBar>
+    }
+
+    <CourseStaffList CourseId="@course.Id"
+                     Staff="@course.Staff"
+                     CanManage="@canManage" />
+
+    <AssignmentList Assignments="@assignments"
+                    CourseId="@course.Id"
+                    CanManage="@canManage"
+                    CanViewStatus="@canViewStatus" />
+
+    @if (canManage)
+    {
+        <CreateAssignmentForm CourseId="@course.Id"
+                              Templates="@templates" />
+        <CourseRosterList Students="@students" />
+        <ImportCourseRosterForm CourseId="@course.Id" />
+        <AddCourseStaffForm CourseId="@course.Id"
+                            Candidates="@candidates" />
+        <CourseAuditList Events="@auditEvents" />
+    }
+}
+else
+{
+    <h1>Course not found</h1>
+    <FluentMessageBar Intent="MessageBarIntent.Warning">
+        The course does not exist or is not available to your account.
+    </FluentMessageBar>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    [SupplyParameterFromQuery] private string? Error { get; set; }
+
+    private CourseResponse? course;
+    private IReadOnlyList<CourseStaffCandidateResponse> candidates = [];
+    private IReadOnlyList<CourseStudentResponse> students = [];
+    private IReadOnlyList<AssignmentResponse> assignments = [];
+    private IReadOnlyList<CourseAuditEventResponse> auditEvents = [];
+    private IReadOnlyList<PirateForgeGitServer.Contracts.Git.RepositoryTemplateResponse> templates = [];
+    private bool canManage;
+    private bool canViewStatus;
+
+    protected override async Task OnInitializedAsync()
+    {
+        course = await CourseApi.GetAsync(Id);
+        if (course is null)
+        {
+            return;
+        }
+
+        assignments = await AssignmentApi.ListAssignmentsAsync(Id);
+
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userIdValue = state.User.FindFirst(
+            System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        canManage = state.User.IsInRole("Administrator")
+            || Guid.TryParse(userIdValue, out var userId)
+            && course.Staff.Any(member =>
+                member.UserId == userId
+                && member.Role == "Instructor");
+        canViewStatus = state.User.IsInRole("Administrator")
+            || Guid.TryParse(userIdValue, out userId)
+            && course.Staff.Any(member =>
+                member.UserId == userId
+                && member.Role is "Instructor" or "TA");
+        if (canManage)
+        {
+            templates = await AssignmentApi.ListTemplatesAsync();
+            students = await CourseApi.ListStudentsAsync(Id);
+            auditEvents = await CourseApi.ListAuditEventsAsync(Id);
+            var assignedIds = course.Staff
+                .Select(member => member.UserId)
+                .ToHashSet();
+            candidates = (await CourseApi.ListStaffCandidatesAsync())
+                .Where(candidate => !assignedIds.Contains(candidate.UserId))
+                .ToArray();
+        }
+    }
+}

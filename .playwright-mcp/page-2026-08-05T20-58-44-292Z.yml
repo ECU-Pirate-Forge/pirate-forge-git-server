@@ -1,0 +1,48 @@
+- generic [ref=f17e3]:
+  - generic [ref=f17e4]:
+    - text: Pirate Forge Git Server
+    - generic [ref=f17e5]: admin@pirateforge.local
+    - generic [ref=f17e6]: Sign out
+  - navigation [ref=f17e10]:
+    - link "Home" [ref=f17e11] [cursor=pointer]:
+      - /url: /
+    - link "Repositories" [ref=f17e12] [cursor=pointer]:
+      - /url: /repositories
+    - link "Courses" [ref=f17e13] [cursor=pointer]:
+      - /url: /courses
+    - link "Templates" [ref=f17e14] [cursor=pointer]:
+      - /url: /templates
+  - generic [ref=f17e16]:
+    - paragraph [ref=f17e17]:
+      - generic [ref=f17e18] [cursor=pointer]:
+        - generic:
+          - text: Course
+          - link [ref=f17e19]:
+            - /url: /courses/1d3e24b9-560a-4a0b-a584-35886210fbd0
+      - text: / week-1
+    - heading "Week 1 Assignment status" [active] [level=1] [ref=f17e20]
+    - group [ref=f17e21]:
+      - paragraph [ref=f17e22]: 1 of 1 repositories provisioned.
+      - table [ref=f17e23]:
+        - rowgroup [ref=f17e24]:
+          - row [ref=f17e25]:
+            - columnheader "Student" [ref=f17e26]
+            - columnheader "Status" [ref=f17e27]
+            - columnheader "Repository" [ref=f17e28]
+            - columnheader "Latest commit" [ref=f17e29]
+        - rowgroup [ref=f17e30]:
+          - row [ref=f17e31]:
+            - cell [ref=f17e32]:
+              - strong [ref=f17e33]: Step 8 Runtime Student
+              - text: step8.student@example.edu
+            - cell "Empty repository" [ref=f17e34]
+            - cell [ref=f17e35]:
+              - generic [ref=f17e36] [cursor=pointer]:
+                - generic:
+                  - text: test101-week-1-63105df23b5043e9b67a55dec2dc53c7
+                  - link [ref=f17e37]:
+                    - /url: /repositories/test101-week-1-63105df23b5043e9b67a55dec2dc53c7
+            - cell "No commits" [ref=f17e38]
+  - generic [ref=f17e40]:
+    - generic [ref=f17e41] [cursor=pointer]: Documentation and demos
+    - generic [ref=f17e44] [cursor=pointer]: About Pirate Forge

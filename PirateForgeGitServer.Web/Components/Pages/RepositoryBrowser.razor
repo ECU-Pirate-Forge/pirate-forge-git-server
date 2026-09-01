@@ -1,0 +1,91 @@
+@page "/repositories/{Name}"
+@attribute [Authorize]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Git
+@using PirateForgeGitServer.Web.Repositories
+@inject RepositoryApiClient RepositoryApi
+
+<PageTitle>@Name · Repository</PageTitle>
+
+<h1>@Name</h1>
+
+@if (branches.Count == 0)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Info">
+        This repository is empty. Push an initial branch before browsing files.
+    </FluentMessageBar>
+}
+else
+{
+    <RepositoryBranchNav RepositoryName="@Name"
+                         Branches="@branches"
+                         SelectedBranch="@selectedBranch" />
+
+    <FluentSpacer />
+        <FluentButton Appearance="ButtonAppearance.Primary"
+                      Href="@($"/repositories/{Name}/download?branch={Uri.EscapeDataString(selectedBranch)}")">
+            Download ZIP
+        </FluentButton>
+
+    @if (file is not null)
+    {
+        <RepositoryFileView File="@file" />
+    }
+    else
+    {
+        <RepositoryTree RepositoryName="@Name"
+                        Branch="@selectedBranch"
+                        Path="@Path"
+                        Entries="@entries" />
+    }
+
+    <RepositoryCommitList Commits="@commits" />
+}
+
+@code {
+    [Parameter, EditorRequired] public required string Name { get; set; }
+    [SupplyParameterFromQuery] public string? Branch { get; set; }
+    [SupplyParameterFromQuery] public string? Path { get; set; }
+    public string? FilePath { get; set; }
+
+    private IReadOnlyList<RepositoryBranchResponse> branches = [];
+    private IReadOnlyList<RepositoryTreeEntryResponse> entries = [];
+    private IReadOnlyList<RepositoryCommitResponse> commits = [];
+    private RepositoryFileResponse? file;
+    private string selectedBranch = string.Empty;
+
+    [SupplyParameterFromQuery(Name = "file")]
+    private string? FileQuery
+    {
+        get => FilePath;
+        set => FilePath = value;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        branches = await RepositoryApi.ListBranchesAsync(Name);
+        if (branches.Count == 0)
+        {
+            return;
+        }
+
+        selectedBranch = Branch
+            ?? branches.FirstOrDefault()?.Name
+            ?? "main";
+        commits = await RepositoryApi.ListCommitsAsync(Name, selectedBranch);
+        if (!string.IsNullOrEmpty(FilePath))
+        {
+            file = await RepositoryApi.ReadFileAsync(
+                Name,
+                selectedBranch,
+                FilePath);
+        }
+        else
+        {
+            entries = await RepositoryApi.ListTreeAsync(
+                Name,
+                selectedBranch,
+                Path);
+        }
+    }
+}

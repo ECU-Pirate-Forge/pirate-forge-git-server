@@ -1,0 +1,68 @@
+@page "/courses"
+@attribute [Authorize]
+@attribute [ExcludeFromInteractiveRouting]
+@using PirateForgeGitServer.Contracts.Courses
+@using PirateForgeGitServer.Web.Courses
+@inject CourseApiClient CourseApi
+
+<PageTitle>Courses</PageTitle>
+
+<h1>Courses</h1>
+<p>Create and manage the courses available to you.</p>
+
+@if (Error == "duplicate")
+{
+    <FluentMessageBar Intent="MessageBarIntent.Error">
+        A course with that code already exists.
+    </FluentMessageBar>
+}
+else if (Error == "invalid")
+{
+    <FluentMessageBar Intent="MessageBarIntent.Error">
+        Enter a valid course code and a course name of no more than 200 characters.
+    </FluentMessageBar>
+}
+
+<AuthorizeView Roles="Administrator,Instructor">
+    <Authorized>
+        <FluentCard>
+            <h2>Create a course</h2>
+            <form method="post" action="/courses/create" class="course-form">
+                <AntiforgeryToken />
+                <FluentTextInput Name="Code"
+                                 Label="Course code"
+                                 Required="true"
+                                 Width="100%" />
+                <FluentTextInput Name="Name"
+                                 Label="Course name"
+                                 Required="true"
+                                 Width="100%" />
+                <FluentButton Type="ButtonType.Submit"
+                              Appearance="ButtonAppearance.Primary">
+                    Create course
+                </FluentButton>
+            </form>
+        </FluentCard>
+    </Authorized>
+</AuthorizeView>
+
+@if (courses.Count == 0)
+{
+    <FluentMessageBar Intent="MessageBarIntent.Info">
+        No courses are available.
+    </FluentMessageBar>
+}
+else
+{
+    <CourseList Courses="@courses" />
+}
+
+@code {
+    [SupplyParameterFromQuery] private string? Error { get; set; }
+    private IReadOnlyList<CourseResponse> courses = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        courses = await CourseApi.ListAsync();
+    }
+}
