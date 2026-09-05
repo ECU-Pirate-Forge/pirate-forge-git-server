@@ -1,4 +1,11 @@
 services:
+  migrationworker:
+    image: "${MIGRATIONWORKER_IMAGE}"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      PirateForge__Storage__RootPath: "/var/lib/pirateforge"
+    networks:
+      - "aspire"
   webfrontend:
     image: "${WEBFRONTEND_IMAGE}"
     environment:
@@ -40,6 +47,9 @@ services:
       - type: "bind"
         target: "/var/lib/pirateforge"
         source: "${STORAGE_PATH}"
+    depends_on:
+      migrationworker:
+        condition: "service_started"
     networks:
       - "aspire"
     restart: "unless-stopped"
