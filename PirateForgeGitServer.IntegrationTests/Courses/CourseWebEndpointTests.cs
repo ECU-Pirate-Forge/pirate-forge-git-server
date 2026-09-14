@@ -17,6 +17,35 @@ namespace PirateForgeGitServer.IntegrationTests.Courses;
 public sealed class CourseWebEndpointTests
 {
     [Fact]
+    public async Task RepositoriesPageGroupsAssignmentsWithoutListingStudentRepositories()
+    {
+        var tracker = new RepositoryPageRequestTracker();
+        using var factory = CreateFactory(() => new RepositoryPageApiHandler(tracker));
+        using var client = CreateClient(factory);
+        await LoginAsync(client);
+
+        using var page = await client.GetAsync("/repositories");
+
+        page.EnsureSuccessStatusCode();
+        var html = await page.Content.ReadAsStringAsync();
+        Assert.Contains("CS101 · Existing Course", html, StringComparison.Ordinal);
+        Assert.Contains("Project One", html, StringComparison.Ordinal);
+        Assert.Contains(
+            "href=\"/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/repositories\"",
+            html,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "Project One - Active Student",
+            html,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "/repositories/cs101-project-1-active",
+            html,
+            StringComparison.Ordinal);
+        Assert.Equal(0, tracker.RepositoryListRequestCount);
+    }
+
+    [Fact]
     public async Task InstructorCanRenderAndCreateCoursesFromTheWeb()
     {
         using var factory = new WebApplicationFactory<App>()
@@ -720,6 +749,97 @@ public sealed class CourseWebEndpointTests
                         Encoding.UTF8,
                         "application/json"),
             };
+        }
+    }
+
+    private sealed class RepositoryPageRequestTracker
+    {
+        public int RepositoryListRequestCount { get; set; }
+    }
+
+    private sealed class RepositoryPageApiHandler(
+        RepositoryPageRequestTracker tracker)
+        : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var path = request.RequestUri?.AbsolutePath;
+            var json = (request.Method.Method, path) switch
+            {
+                ("POST", "/api/auth/login") =>
+                    """
+                    {
+                      "tokenType": "Bearer",
+                      "accessToken": "access-token",
+                      "expiresIn": 3600,
+                      "refreshToken": "refresh-token"
+                    }
+                    """,
+                ("GET", "/api/auth/me") =>
+                    """
+                    {
+                      "id": "11111111-1111-1111-1111-111111111111",
+                      "email": "instructor@example.edu",
+                      "displayName": "Course Instructor",
+                      "roles": ["Instructor"]
+                    }
+                    """,
+                ("GET", "/api/courses") =>
+                    """
+                    [{
+                      "id": "11111111-1111-1111-1111-111111111112",
+                      "code": "CS101",
+                      "name": "Existing Course",
+                      "createdAt": "2026-08-05T00:00:00Z",
+                      "staff": []
+                    }]
+                    """,
+                ("GET", "/api/courses/11111111-1111-1111-1111-111111111112/assignments") =>
+                    """
+                    [{
+                      "id": "44444444-4444-4444-4444-444444444444",
+                      "courseId": "11111111-1111-1111-1111-111111111112",
+                      "slug": "project-1",
+                      "title": "Project One",
+                      "description": "First project",
+                      "template": null,
+                      "dueAt": null,
+                      "createdByUserId": "11111111-1111-1111-1111-111111111111",
+                      "createdAt": "2026-08-05T00:00:00Z",
+                      "studentCount": 1,
+                      "provisionedRepositoryCount": 1
+                    }]
+                    """,
+                ("GET", "/api/repositories") => TrackRepositoryListRequest(),
+                _ => throw new InvalidOperationException(
+                    $"Unexpected API request: {request.Method} {request.RequestUri}"),
+            };
+
+            return Task.FromResult(
+                new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new StringContent(
+                        json,
+                        Encoding.UTF8,
+                        "application/json"),
+                });
+        }
+
+        private string TrackRepositoryListRequest()
+        {
+            tracker.RepositoryListRequestCount++;
+            return
+                """
+                [{
+                  "id": "66666666-6666-6666-6666-666666666666",
+                  "name": "cs101-project-1-active",
+                  "displayName": "Project One - Active Student",
+                  "ownerUserId": "33333333-3333-3333-3333-333333333333",
+                  "createdAt": "2026-08-05T00:00:00Z"
+                }]
+                """;
         }
     }
 
