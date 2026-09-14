@@ -104,7 +104,8 @@ public sealed class CourseWebEndpointTests
         await LoginAsync(client);
 
         using var page = await client.GetAsync(
-            "/courses/11111111-1111-1111-1111-111111111112");
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=students&action=import-students");
         page.EnsureSuccessStatusCode();
         var html = await page.Content.ReadAsStringAsync();
         Assert.Contains("Student Roster", html, StringComparison.Ordinal);
@@ -139,6 +140,23 @@ public sealed class CourseWebEndpointTests
             "\"'=HYPERLINK(\"\"https://example.test\"\")\"",
             csv,
             StringComparison.Ordinal);
+
+        using var invalidContent = new MultipartFormDataContent();
+        invalidContent.Add(
+            new StringContent(antiforgeryToken),
+            "__RequestVerificationToken");
+        invalidContent.Add(
+            new ByteArrayContent([]),
+            "RosterFile",
+            "empty.csv");
+        using var invalidResponse = await client.PostAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/roster/import",
+            invalidContent);
+        Assert.Equal(HttpStatusCode.Redirect, invalidResponse.StatusCode);
+        Assert.Equal(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=students&action=import-students&error=invalid-roster",
+            invalidResponse.Headers.Location?.OriginalString);
     }
 
     [Fact]
@@ -213,17 +231,138 @@ public sealed class CourseWebEndpointTests
         coursePage.EnsureSuccessStatusCode();
         var courseHtml = await coursePage.Content.ReadAsStringAsync();
         Assert.Contains("Assignments", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("?tab=students", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("?tab=staff", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("?tab=activity", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("aria-current=\"page\"", courseHtml, StringComparison.Ordinal);
         Assert.Contains("Project One", courseHtml, StringComparison.Ordinal);
-        Assert.Contains("Download activity", courseHtml, StringComparison.Ordinal);
-        Assert.Contains("Course Instructor", courseHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Download activity", courseHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("course-staff-table", courseHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("name=\"Slug\"", courseHtml, StringComparison.Ordinal);
         Assert.Contains("2 of 3", courseHtml, StringComparison.Ordinal);
         Assert.Contains("Provision missing repositories", courseHtml, StringComparison.Ordinal);
-        Assert.Contains("View status", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("View repositories", courseHtml, StringComparison.Ordinal);
+
+        using var createAssignmentPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=assignments&action=create-assignment");
+        createAssignmentPage.EnsureSuccessStatusCode();
+        var createAssignmentHtml =
+            await createAssignmentPage.Content.ReadAsStringAsync();
+        Assert.Contains("name=\"Slug\"", createAssignmentHtml, StringComparison.Ordinal);
+        Assert.Contains("Project Starter", createAssignmentHtml, StringComparison.Ordinal);
+
+        using var studentsPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=students");
+        studentsPage.EnsureSuccessStatusCode();
+        var studentsHtml = await studentsPage.Content.ReadAsStringAsync();
+        Assert.Contains("Student Roster", studentsHtml, StringComparison.Ordinal);
+        Assert.Contains(
+            "No students are enrolled in this course.",
+            studentsHtml,
+            StringComparison.Ordinal);
+        Assert.DoesNotContain("Project One", studentsHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "name=\"RosterFile\"",
+            studentsHtml,
+            StringComparison.Ordinal);
+
+        using var importStudentsPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=students&action=import-students");
+        importStudentsPage.EnsureSuccessStatusCode();
+        Assert.Contains(
+            "name=\"RosterFile\"",
+            await importStudentsPage.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
+
+        using var staffPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=staff");
+        staffPage.EnsureSuccessStatusCode();
+        var staffHtml = await staffPage.Content.ReadAsStringAsync();
+        Assert.Contains("Course staff", staffHtml, StringComparison.Ordinal);
+        Assert.Contains("Course Instructor", staffHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "name=\"StaffSelection\"",
+            staffHtml,
+            StringComparison.Ordinal);
+
+        using var addStaffPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=staff&action=add-course-staff");
+        addStaffPage.EnsureSuccessStatusCode();
+        var addStaffHtml = await addStaffPage.Content.ReadAsStringAsync();
+        Assert.Contains(
+            "No unassigned Instructor or TA accounts are available.",
+            addStaffHtml,
+            StringComparison.Ordinal);
+        var addStaffToken = GetAntiforgeryToken(addStaffHtml);
+        using var invalidStaffResponse = await client.PostAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/staff",
+            new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    ["StaffSelection"] = "",
+                    ["__RequestVerificationToken"] = addStaffToken,
+                }));
+        Assert.Equal(HttpStatusCode.Redirect, invalidStaffResponse.StatusCode);
+        Assert.Equal(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=staff&action=add-course-staff&error=invalid-staff",
+            invalidStaffResponse.Headers.Location?.OriginalString);
+
+        using var addStaffResponse = await client.PostAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/staff",
+            new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    ["StaffSelection"] =
+                        "22222222-2222-2222-2222-222222222222:TA",
+                    ["__RequestVerificationToken"] = addStaffToken,
+                }));
+        Assert.Equal(HttpStatusCode.Redirect, addStaffResponse.StatusCode);
+        Assert.Equal(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=staff",
+            addStaffResponse.Headers.Location?.OriginalString);
+
+        using var removeStaffResponse = await client.PostAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/staff/remove",
+            new FormUrlEncodedContent(
+                new Dictionary<string, string>
+                {
+                    ["UserId"] = "11111111-1111-1111-1111-111111111111",
+                    ["__RequestVerificationToken"] = addStaffToken,
+                }));
+        Assert.Equal(HttpStatusCode.Redirect, removeStaffResponse.StatusCode);
+        Assert.Equal(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=staff",
+            removeStaffResponse.Headers.Location?.OriginalString);
+
+        using var activityPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=activity");
+        activityPage.EnsureSuccessStatusCode();
+        var activityHtml = await activityPage.Content.ReadAsStringAsync();
+        Assert.Contains("Download activity", activityHtml, StringComparison.Ordinal);
+        Assert.Contains(
+            "All assignment repositories",
+            activityHtml,
+            StringComparison.Ordinal);
+
+        using var invalidTabPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=unknown");
+        invalidTabPage.EnsureSuccessStatusCode();
+        var invalidTabHtml = await invalidTabPage.Content.ReadAsStringAsync();
+        Assert.Contains("Project One", invalidTabHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "Download activity",
+            invalidTabHtml,
+            StringComparison.Ordinal);
+
         using var statusPage = await client.GetAsync(
             "/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/status");
         statusPage.EnsureSuccessStatusCode();
         var statusHtml = await statusPage.Content.ReadAsStringAsync();
-        Assert.Contains("Project One status", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("Project One repositories", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Download all repositories", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Active Student", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Pending Student", statusHtml, StringComparison.Ordinal);
@@ -240,7 +379,6 @@ public sealed class CourseWebEndpointTests
         Assert.Equal(
             "application/zip",
             bulkDownload.Content.Headers.ContentType?.MediaType);
-        Assert.Contains("Create assignment", courseHtml, StringComparison.Ordinal);
         var courseToken = GetAntiforgeryToken(courseHtml);
         using var provisionResponse = await client.PostAsync(
             "/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/repositories",
@@ -251,7 +389,7 @@ public sealed class CourseWebEndpointTests
                 }));
         Assert.Equal(HttpStatusCode.Redirect, provisionResponse.StatusCode);
         Assert.Equal(
-            "/courses/11111111-1111-1111-1111-111111111112",
+            "/courses/11111111-1111-1111-1111-111111111112?tab=assignments",
             provisionResponse.Headers.Location?.OriginalString);
 
         using var createAssignmentResponse = await client.PostAsync(
@@ -269,7 +407,7 @@ public sealed class CourseWebEndpointTests
                 }));
         Assert.Equal(HttpStatusCode.Redirect, createAssignmentResponse.StatusCode);
         Assert.Equal(
-            "/courses/11111111-1111-1111-1111-111111111112",
+            "/courses/11111111-1111-1111-1111-111111111112?tab=assignments",
             createAssignmentResponse.Headers.Location?.OriginalString);
 
         using var invalidAssignmentResponse = await client.PostAsync(
@@ -286,7 +424,8 @@ public sealed class CourseWebEndpointTests
                 }));
         Assert.Equal(HttpStatusCode.Redirect, invalidAssignmentResponse.StatusCode);
         Assert.Equal(
-            "/courses/11111111-1111-1111-1111-111111111112?error=invalid-assignment",
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=assignments&action=create-assignment&error=invalid-assignment",
             invalidAssignmentResponse.Headers.Location?.OriginalString);
 
         using var provisioningFailureResponse = await client.PostAsync(
@@ -302,8 +441,58 @@ public sealed class CourseWebEndpointTests
                     ["__RequestVerificationToken"] = courseToken,
                 }));
         Assert.Equal(
-            "/courses/11111111-1111-1111-1111-111111111112?error=provisioning",
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=assignments&error=provisioning",
             provisioningFailureResponse.Headers.Location?.OriginalString);
+    }
+
+    [Fact]
+    public async Task CourseTabsHideManagementSectionsFromNonManagers()
+    {
+        using var factory = CreateFactory(
+            () => new AssignmentWebApiHandler(includeCurrentInstructorAsStaff: false));
+        using var client = CreateClient(factory);
+        await LoginAsync(client);
+
+        using var page = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=students");
+        page.EnsureSuccessStatusCode();
+        var html = await page.Content.ReadAsStringAsync();
+
+        Assert.Contains("Project One", html, StringComparison.Ordinal);
+        Assert.Contains("?tab=staff", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("?tab=students", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("?tab=activity", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("Student Roster", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("Download activity", html, StringComparison.Ordinal);
+
+        using var activityPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112?tab=activity");
+        activityPage.EnsureSuccessStatusCode();
+        var activityHtml = await activityPage.Content.ReadAsStringAsync();
+        Assert.Contains("Project One", activityHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain(
+            "Download activity",
+            activityHtml,
+            StringComparison.Ordinal);
+
+        using var assignmentActionPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=assignments&action=create-assignment");
+        assignmentActionPage.EnsureSuccessStatusCode();
+        Assert.DoesNotContain(
+            "name=\"Slug\"",
+            await assignmentActionPage.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
+
+        using var staffActionPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112"
+            + "?tab=staff&action=add-course-staff");
+        staffActionPage.EnsureSuccessStatusCode();
+        Assert.DoesNotContain(
+            "Add course staff",
+            await staffActionPage.Content.ReadAsStringAsync(),
+            StringComparison.Ordinal);
     }
 
     [Fact]
@@ -579,7 +768,9 @@ public sealed class CourseWebEndpointTests
         }
     }
 
-    private sealed class AssignmentWebApiHandler(bool forbidArchive = false)
+    private sealed class AssignmentWebApiHandler(
+        bool forbidArchive = false,
+        bool includeCurrentInstructorAsStaff = true)
         : HttpMessageHandler
     {
         protected override Task<HttpResponseMessage> SendAsync(
@@ -678,7 +869,8 @@ public sealed class CourseWebEndpointTests
                     "[]"),
                 ("GET", "/api/courses/11111111-1111-1111-1111-111111111112") => (
                     HttpStatusCode.OK,
-                    """
+                    includeCurrentInstructorAsStaff
+                    ? """
                     {
                       "id": "11111111-1111-1111-1111-111111111112",
                       "code": "CS101",
@@ -692,10 +884,25 @@ public sealed class CourseWebEndpointTests
                         "addedAt": "2026-08-05T00:00:00Z"
                       }]
                     }
+                    """
+                    : """
+                    {
+                      "id": "11111111-1111-1111-1111-111111111112",
+                      "code": "CS101",
+                      "name": "Existing Course",
+                      "createdAt": "2026-08-05T00:00:00Z",
+                      "staff": []
+                    }
                     """),
                 ("GET", "/api/courses/staff-candidates") => (
                     HttpStatusCode.OK,
                     "[]"),
+                ("POST", "/api/courses/11111111-1111-1111-1111-111111111112/staff") => (
+                    HttpStatusCode.NoContent,
+                    string.Empty),
+                ("DELETE", "/api/courses/11111111-1111-1111-1111-111111111112/staff/11111111-1111-1111-1111-111111111111") => (
+                    HttpStatusCode.NoContent,
+                    string.Empty),
                 ("GET", "/api/courses/11111111-1111-1111-1111-111111111112/audit-events") => (
                     HttpStatusCode.OK,
                     """
