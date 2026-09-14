@@ -22,10 +22,11 @@ else
                          SelectedBranch="@selectedBranch" />
 
     <FluentSpacer />
-        <FluentButton Appearance="ButtonAppearance.Primary"
-                      Href="@($"/repositories/{Name}/download?branch={Uri.EscapeDataString(selectedBranch)}")">
-            Download ZIP
-        </FluentButton>
+    <FluentAnchorButton Appearance="ButtonAppearance.Primary"
+                        Href="@($"/repositories/{Name}/download?branch={Uri.EscapeDataString(selectedBranch)}")"
+                        data-enhance-nav="false">
+        Download ZIP
+    </FluentAnchorButton>
 
     @if (file is not null)
     {

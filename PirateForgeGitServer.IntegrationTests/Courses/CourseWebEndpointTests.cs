@@ -320,6 +320,58 @@ public sealed class CourseWebEndpointTests
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    [Fact]
+    public async Task DownloadLinksUseNativeNavigationAndReturnZipAttachments()
+    {
+        using var factory = CreateFactory(() => new AssignmentWebApiHandler());
+        using var client = CreateClient(factory);
+        await LoginAsync(client);
+
+        using var repositoryPage = await client.GetAsync(
+            "/repositories/cs101-project-1-active");
+        repositoryPage.EnsureSuccessStatusCode();
+        var repositoryHtml = await repositoryPage.Content.ReadAsStringAsync();
+        Assert.Contains(
+            "href=\"/repositories/cs101-project-1-active/download?branch=main\"",
+            repositoryHtml,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "data-enhance-nav=\"false\"",
+            repositoryHtml,
+            StringComparison.Ordinal);
+
+        using var repositoryDownload = await client.GetAsync(
+            "/repositories/cs101-project-1-active/download?branch=main");
+        repositoryDownload.EnsureSuccessStatusCode();
+        AssertZipAttachment(repositoryDownload, "cs101-project-1-active-main.zip");
+        Assert.Equal(
+            "repository-archive",
+            await repositoryDownload.Content.ReadAsStringAsync());
+
+        using var assignmentPage = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/status");
+        assignmentPage.EnsureSuccessStatusCode();
+        var assignmentHtml = await assignmentPage.Content.ReadAsStringAsync();
+        Assert.Contains(
+            "href=\"/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/download\"",
+            assignmentHtml,
+            StringComparison.Ordinal);
+        Assert.Contains(
+            "data-enhance-nav=\"false\"",
+            assignmentHtml,
+            StringComparison.Ordinal);
+
+        using var assignmentDownload = await client.GetAsync(
+            "/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/download");
+        assignmentDownload.EnsureSuccessStatusCode();
+        AssertZipAttachment(
+            assignmentDownload,
+            "assignment-44444444-4444-4444-4444-444444444444-repositories.zip");
+        Assert.Equal(
+            "bulk-archive",
+            await assignmentDownload.Content.ReadAsStringAsync());
+    }
+
     private static WebApplicationFactory<App> CreateFactory(
         Func<HttpMessageHandler> handlerFactory) =>
         new WebApplicationFactory<App>()
@@ -371,6 +423,23 @@ public sealed class CourseWebEndpointTests
             "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"")
         .Groups[1]
         .Value;
+
+    private static void AssertZipAttachment(
+        HttpResponseMessage response,
+        string expectedFileName)
+    {
+        Assert.Equal(
+            "application/zip",
+            response.Content.Headers.ContentType?.MediaType);
+        Assert.Equal(
+            "attachment",
+            response.Content.Headers.ContentDisposition?.DispositionType);
+        Assert.Contains(
+            expectedFileName,
+            response.Content.Headers.ContentDisposition?.ToString()
+                ?? string.Empty,
+            StringComparison.Ordinal);
+    }
 
     private static async Task LoginAsync(HttpClient client)
     {
@@ -676,6 +745,39 @@ public sealed class CourseWebEndpointTests
                 ("GET", "/api/repositories/new-template/branches") => (
                     HttpStatusCode.OK,
                     "[]"),
+                ("GET", "/api/repositories/cs101-project-1-active/branches") => (
+                    HttpStatusCode.OK,
+                    """
+                    [{
+                      "name": "main",
+                      "commitId": "0123456789012345678901234567890123456789",
+                      "committedAt": "2026-08-05T00:00:00Z"
+                    }]
+                    """),
+                ("GET", "/api/repositories/cs101-project-1-active/tree") => (
+                    HttpStatusCode.OK,
+                    """
+                    [{
+                      "name": "README.md",
+                      "path": "README.md",
+                      "kind": "File",
+                      "size": 18
+                    }]
+                    """),
+                ("GET", "/api/repositories/cs101-project-1-active/commits") => (
+                    HttpStatusCode.OK,
+                    """
+                    [{
+                      "id": "0123456789012345678901234567890123456789",
+                      "subject": "Add starter",
+                      "authorName": "Template Author",
+                      "authorEmail": "template@example.edu",
+                      "authoredAt": "2026-08-05T00:00:00Z"
+                    }]
+                    """),
+                ("GET", "/api/repositories/cs101-project-1-active/archive") => (
+                    HttpStatusCode.OK,
+                    "repository-archive"),
                 ("GET", "/api/courses/11111111-1111-1111-1111-111111111112") => (
                     HttpStatusCode.OK,
                     """

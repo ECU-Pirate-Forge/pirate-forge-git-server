@@ -25,10 +25,11 @@ else
     </p>
     <h1>@status.Title repositories</h1>
     <p>
-        <FluentButton Appearance="ButtonAppearance.Primary"
-                      Href="@($"/courses/{CourseId}/assignments/{AssignmentId}/download")">
+        <FluentAnchorButton Appearance="ButtonAppearance.Primary"
+                            Href="@($"/courses/{CourseId}/assignments/{AssignmentId}/download")"
+                            data-enhance-nav="false">
             Download all repositories
-        </FluentButton>
+        </FluentAnchorButton>
     </p>
     <AssignmentStatusTable Status="@status" />
 }
