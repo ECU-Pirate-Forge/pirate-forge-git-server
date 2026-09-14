@@ -344,7 +344,8 @@ app.MapPost(
                     out _))
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-assignment");
+                    $"/courses/{courseId}?tab=assignments"
+                    + "&action=create-assignment&error=invalid-assignment");
             }
 
             if (!string.IsNullOrWhiteSpace(form.DueAt)
@@ -355,7 +356,8 @@ app.MapPost(
                     out _))
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-assignment");
+                    $"/courses/{courseId}?tab=assignments"
+                    + "&action=create-assignment&error=invalid-assignment");
             }
 
             Guid? templateId = Guid.TryParse(
@@ -394,10 +396,11 @@ app.MapPost(
                 result.Status switch
                 {
                     AssignmentCreationStatus.Created =>
-                        $"/courses/{courseId}",
+                        $"/courses/{courseId}?tab=assignments",
                     AssignmentCreationStatus.ProvisioningFailed =>
-                        $"/courses/{courseId}?error=provisioning",
-                    _ => $"/courses/{courseId}?error=invalid-assignment",
+                        $"/courses/{courseId}?tab=assignments&error=provisioning",
+                    _ => $"/courses/{courseId}?tab=assignments"
+                        + "&action=create-assignment&error=invalid-assignment",
                 });
         })
     .RequireAuthorization(policy =>
@@ -418,8 +421,8 @@ app.MapPost(
                 cancellationToken);
             return TypedResults.LocalRedirect(
                 provisioned
-                    ? $"/courses/{courseId}"
-                    : $"/courses/{courseId}?error=provisioning");
+                    ? $"/courses/{courseId}?tab=assignments"
+                    : $"/courses/{courseId}?tab=assignments&error=provisioning");
         })
     .RequireAuthorization(policy =>
         policy.RequireRole("Administrator", "Instructor"));
@@ -439,7 +442,8 @@ app.MapPost(
                     out var userId))
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-staff");
+                    $"/courses/{courseId}?tab=staff"
+                    + "&action=add-course-staff&error=invalid-staff");
             }
 
             var added = await courseApi.AddStaffAsync(
@@ -450,8 +454,9 @@ app.MapPost(
                 cancellationToken);
             return TypedResults.LocalRedirect(
                 added
-                    ? $"/courses/{courseId}"
-                    : $"/courses/{courseId}?error=staff-conflict");
+                    ? $"/courses/{courseId}?tab=staff"
+                    : $"/courses/{courseId}?tab=staff"
+                        + "&action=add-course-staff&error=staff-conflict");
         })
     .RequireAuthorization(policy =>
         policy.RequireRole("Administrator", "Instructor"));
@@ -470,8 +475,8 @@ app.MapPost(
                 cancellationToken);
             return TypedResults.LocalRedirect(
                 removed
-                    ? $"/courses/{courseId}"
-                    : $"/courses/{courseId}?error=staff-conflict");
+                    ? $"/courses/{courseId}?tab=staff"
+                    : $"/courses/{courseId}?tab=staff&error=staff-conflict");
         })
     .RequireAuthorization(policy =>
         policy.RequireRole("Administrator", "Instructor"));
@@ -490,7 +495,8 @@ app.MapPost(
                 || form.RosterFile.Length > 1024 * 1024)
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-roster");
+                    $"/courses/{courseId}?tab=students"
+                    + "&action=import-students&error=invalid-roster");
             }
 
             string csv;
@@ -508,7 +514,8 @@ app.MapPost(
             catch (DecoderFallbackException)
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-roster");
+                    $"/courses/{courseId}?tab=students"
+                    + "&action=import-students&error=invalid-roster");
             }
 
             var result = await courseApi.ImportRosterAsync(
@@ -518,7 +525,8 @@ app.MapPost(
             if (result is null)
             {
                 return TypedResults.LocalRedirect(
-                    $"/courses/{courseId}?error=invalid-roster");
+                    $"/courses/{courseId}?tab=students"
+                    + "&action=import-students&error=invalid-roster");
             }
 
             var output = new StringBuilder(

@@ -1,0 +1,59 @@
+<nav class="course-tabs"
+     aria-label="Course sections"
+     data-enhance-nav="false">
+    <ul>
+        <li>
+            <a id="assignments-tab"
+               class="@GetTabClass("assignments")"
+               href="@GetTabUrl("assignments")"
+               aria-current="@GetAriaCurrent("assignments")">
+                Assignments
+            </a>
+        </li>
+        @if (CanManage)
+        {
+            <li>
+                <a id="students-tab"
+                   class="@GetTabClass("students")"
+                   href="@GetTabUrl("students")"
+                   aria-current="@GetAriaCurrent("students")">
+                    Students
+                </a>
+            </li>
+        }
+        <li>
+            <a id="staff-tab"
+               class="@GetTabClass("staff")"
+               href="@GetTabUrl("staff")"
+               aria-current="@GetAriaCurrent("staff")">
+                Staff
+            </a>
+        </li>
+        @if (CanManage)
+        {
+            <li>
+                <a id="activity-tab"
+                   class="@GetTabClass("activity")"
+                   href="@GetTabUrl("activity")"
+                   aria-current="@GetAriaCurrent("activity")">
+                    Activity
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+
+@code {
+    [Parameter, EditorRequired] public required Guid CourseId { get; set; }
+    [Parameter, EditorRequired] public required string ActiveTab { get; set; }
+    [Parameter] public bool CanManage { get; set; }
+
+    private string GetTabUrl(string tab) =>
+        $"/courses/{CourseId}?tab={tab}";
+
+    private string GetTabClass(string tab) =>
+        ActiveTab == tab ? "course-tab active" : "course-tab";
+
+    private string? GetAriaCurrent(string tab) =>
+        ActiveTab == tab ? "page" : null;
+}
