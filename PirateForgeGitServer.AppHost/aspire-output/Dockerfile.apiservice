@@ -1,0 +1,20 @@
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
+WORKDIR /src
+
+COPY Directory.Packages.props .
+COPY PirateForgeGitServer.ApiService/*.csproj ./PirateForgeGitServer.ApiService/
+COPY PirateForgeGitServer.Application/*.csproj ./PirateForgeGitServer.Application/
+COPY PirateForgeGitServer.Contracts/*.csproj ./PirateForgeGitServer.Contracts/
+COPY PirateForgeGitServer.Infrastructure/*.csproj ./PirateForgeGitServer.Infrastructure/
+COPY PirateForgeGitServer.ServiceDefaults/*.csproj ./PirateForgeGitServer.ServiceDefaults/
+
+RUN dotnet restore PirateForgeGitServer.ApiService/PirateForgeGitServer.ApiService.csproj
+
+COPY . .
+RUN dotnet publish PirateForgeGitServer.ApiService/PirateForgeGitServer.ApiService.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:11.0-resolute
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "PirateForgeGitServer.ApiService.dll"]

@@ -1,13 +1,21 @@
 services:
   migrationworker:
+    build:
+      context: "../.."
+      dockerfile: "PirateForgeGitServer.AppHost/aspire-output/Dockerfile.migrationworker"
     image: "${MIGRATIONWORKER_IMAGE}"
+    pull_policy: never
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       PirateForge__Storage__RootPath: "/var/lib/pirateforge"
     networks:
       - "aspire"
   webfrontend:
+    build:
+      context: "../.."
+      dockerfile: "PirateForgeGitServer.AppHost/aspire-output/Dockerfile.webfrontend"
     image: "${WEBFRONTEND_IMAGE}"
+    pull_policy: never
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
@@ -29,7 +37,11 @@ services:
       - "aspire"
     restart: "unless-stopped"
   apiservice:
+    build:
+      context: "../.."
+      dockerfile: "PirateForgeGitServer.AppHost/aspire-output/Dockerfile.apiservice"
     image: "${APISERVICE_IMAGE}"
+    pull_policy: never
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"

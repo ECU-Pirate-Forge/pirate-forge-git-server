@@ -1,0 +1,18 @@
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
+WORKDIR /src
+
+COPY Directory.Packages.props .
+COPY PirateForgeGitServer.Worker/*.csproj ./PirateForgeGitServer.Worker/
+COPY PirateForgeGitServer.Infrastructure/*.csproj ./PirateForgeGitServer.Infrastructure/
+COPY PirateForgeGitServer.ServiceDefaults/*.csproj ./PirateForgeGitServer.ServiceDefaults/
+
+RUN dotnet restore PirateForgeGitServer.Worker/PirateForgeGitServer.Worker.csproj
+
+COPY . .
+RUN dotnet publish PirateForgeGitServer.Worker/PirateForgeGitServer.Worker.csproj -c Release -o /app/publish
+
+FROM mcr.microsoft.com/dotnet/nightly/aspnet:11.0-resolute
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "PirateForgeGitServer.Worker.dll"]
