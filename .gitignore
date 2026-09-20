@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+*/aspire-output/data-protection-keys/*
+*/aspire-output/database/*
+
 # dotenv files
 .env
 
