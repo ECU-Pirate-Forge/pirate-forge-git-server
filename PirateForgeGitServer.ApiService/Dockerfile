@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
@@ -19,7 +19,7 @@ RUN dotnet publish "PirateForgeGitServer.ApiService/PirateForgeGitServer.ApiServ
     --output /app/publish \
     /p:UseAppHost=false
 
-FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:11.0 AS final
 USER root
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends git ca-certificates \

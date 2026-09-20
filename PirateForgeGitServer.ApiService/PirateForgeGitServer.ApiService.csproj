@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net11.0</TargetFramework>
+    <AllowPrerelease>true</AllowPrerelease>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UserSecretsId>9046f5fe-95d2-42c5-bb6e-d8666f0aca66</UserSecretsId>

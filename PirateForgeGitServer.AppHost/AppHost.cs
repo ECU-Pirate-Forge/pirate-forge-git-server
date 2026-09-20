@@ -27,7 +27,7 @@ var webFrontend = builder.AddProject<Projects.PirateForgeGitServer_Web>("webfron
 
 if (builder.ExecutionContext.IsPublishMode)
 {
-    builder.AddDockerComposeEnvironment("docker-compose")
+    var dockerCompose = builder.AddDockerComposeEnvironment("docker-compose")
         .WithDashboard(false);
 
     var deploymentStoragePath = builder.AddParameter("storage-path");
@@ -40,6 +40,7 @@ if (builder.ExecutionContext.IsPublishMode)
         secret: true);
     var bootstrapAdminDisplayName = builder.AddParameter(
         "bootstrap-admin-display-name");
+    
     apiService
         .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http")
         .PublishAsDockerFile(container =>
@@ -53,6 +54,7 @@ if (builder.ExecutionContext.IsPublishMode)
                 $"apiservice;{allowedHosts.AsEnvironmentPlaceholder(resource)}";
             service.Ports.Add(
                 $"127.0.0.1:{gitPort.AsEnvironmentPlaceholder(resource)}:8080");
+            service.Networks.Add("pirateforge-network");
             service.Volumes.Add(
                 new Volume
                 {
@@ -71,6 +73,7 @@ if (builder.ExecutionContext.IsPublishMode)
         .WithEnvironment(
             "PirateForge__BootstrapAdmin__DisplayName",
             bootstrapAdminDisplayName);
+    
     webFrontend
         .WithEnvironment("AllowedHosts", allowedHosts)
         .WithEnvironment("HTTP_PORTS", "8080")
@@ -81,6 +84,7 @@ if (builder.ExecutionContext.IsPublishMode)
             service.Ports.Add(
                 $"127.0.0.1:{webPort.AsEnvironmentPlaceholder(resource)}:8080");
             service.Environment.Remove("APISERVICE_HTTPS");
+            service.Networks.Add("pirateforge-network");
             service.Volumes.Add(
                 new Volume
                 {
@@ -90,7 +94,7 @@ if (builder.ExecutionContext.IsPublishMode)
                         $"{deploymentStoragePath.AsEnvironmentPlaceholder(resource)}/data-protection-keys/web",
                     Target = $"{containerStorageRoot}/data-protection-keys/web",
                 });
-        });
+        });      
 }
 
 builder.Build().Run();
