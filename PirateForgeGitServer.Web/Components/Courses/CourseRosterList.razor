@@ -1,31 +1,60 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<FluentCard>
+<FluentCard Class="data-grid-card">
     @if (Students.Count == 0)
     {
-        <p>No students are enrolled in this course.</p>
+        <div class="empty-state">No students are enrolled in this course.</div>
     }
     else
     {
-        <table class="course-staff-table">
-            <thead>
-                <tr><th>Name</th><th>Email</th><th>Enrolled</th></tr>
-            </thead>
-            <tbody>
-                @foreach (var student in Students)
-                {
-                    <tr>
-                        <td>@student.DisplayName</td>
-                        <td>@student.Email</td>
-                        <td>@student.EnrolledAt.ToString("d")</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter students"
+                             Placeholder="Search name or email"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredStudents.Count student(s)</span>
+        </div>
+        @if (filteredStudents.Count == 0)
+        {
+            <div class="empty-state">No students match your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredStudents.AsQueryable()"
+                                TGridItem="CourseStudentResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <PropertyColumn Property="@(student => student.DisplayName)"
+                                    Title="Name"
+                                    Sortable="true"
+                                    IsDefaultSortColumn="true" />
+                    <PropertyColumn Property="@(student => student.Email)"
+                                    Title="Email"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(student => student.EnrolledAt)"
+                                    Title="Enrolled"
+                                    Format="d"
+                                    Sortable="true" />
+                </FluentDataGrid>
+            </div>
+        }
     }
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<CourseStudentResponse> Students { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<CourseStudentResponse> filteredStudents =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Students
+            : Students.Where(student =>
+                    student.DisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || student.Email.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 }

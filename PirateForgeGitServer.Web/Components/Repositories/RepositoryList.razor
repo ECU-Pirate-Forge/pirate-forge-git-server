@@ -1,21 +1,69 @@
-@using PirateForgeGitServer.Contracts.Git
+﻿@using PirateForgeGitServer.Contracts.Git
+@rendermode InteractiveServer
 
-<div class="repository-grid">
-    @foreach (var repository in Repositories)
+<FluentCard Class="data-grid-card">
+    @if (Repositories.Count == 0)
     {
-        <FluentCard class="repository-card">
-            <h2>
-                <FluentLink Href="@($"/repositories/{repository.Name}")">
-                    @repository.DisplayName
-                </FluentLink>
-            </h2>
-            <code>@(repository.Name).git</code>
-            <p>Created @repository.CreatedAt.ToString("d")</p>
-        </FluentCard>
+        <div class="empty-state">No repositories are available.</div>
     }
-</div>
+    else
+    {
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter repositories"
+                             Placeholder="Search repository name"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredRepositories.Count repository(ies)</span>
+        </div>
+        @if (filteredRepositories.Count == 0)
+        {
+            <div class="empty-state">No repositories match your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredRepositories.AsQueryable()"
+                                TGridItem="RepositoryResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <TemplateColumn Title="Repository"
+                                    SortBy="@(GridSort<RepositoryResponse>.ByAscending(repository => repository.DisplayName))">
+                        <FluentLink Href="@($"/repositories/{context.Name}")"
+                                    Class="grid-primary-link">
+                            @context.DisplayName
+                        </FluentLink>
+                    </TemplateColumn>
+                    <PropertyColumn Property="@(repository => repository.Name)"
+                                    Title="Git name"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(repository => repository.CreatedAt)"
+                                    Title="Created"
+                                    Format="d"
+                                    Sortable="true" />
+                    <TemplateColumn Title="Actions">
+                        <FluentAnchorButton Href="@($"/repositories/{context.Name}")"
+                                            Appearance="ButtonAppearance.Outline">
+                            Browse repository
+                        </FluentAnchorButton>
+                    </TemplateColumn>
+                </FluentDataGrid>
+            </div>
+        }
+    }
+</FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<RepositoryResponse> Repositories { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<RepositoryResponse> filteredRepositories =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Repositories
+            : Repositories.Where(repository =>
+                    repository.DisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || repository.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 }

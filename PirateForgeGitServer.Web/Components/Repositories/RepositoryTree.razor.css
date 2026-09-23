@@ -1,0 +1,84 @@
+.repository-panel {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+.repository-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+    background: var(--colorNeutralBackground2);
+}
+
+.repository-panel-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.repository-panel-header span {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--colorNeutralForeground2);
+    font-size: 0.85rem;
+}
+
+.repository-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+    font-size: 0.9rem;
+}
+
+.repository-path-separator {
+    color: var(--colorNeutralForeground2);
+}
+
+.repository-tree-grid {
+    overflow-x: auto;
+}
+
+.repository-tree-grid ::deep fluent-data-grid {
+    min-width: 30rem;
+}
+
+.repository-tree-grid ::deep fluent-data-grid-cell {
+    padding-block: 0.65rem;
+}
+
+.repository-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.repository-entry ::deep fluent-icon {
+    flex: 0 0 auto;
+}
+
+.repository-entry ::deep fluent-anchor {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.repository-size {
+    color: var(--colorNeutralForeground2);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.repository-empty {
+    padding: 1.5rem 1.25rem;
+    color: var(--colorNeutralForeground2);
+    text-align: center;
+}

@@ -1,0 +1,87 @@
+.repository-panel {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+.repository-path {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+    background: var(--colorNeutralBackground2);
+    font-size: 0.9rem;
+}
+
+.repository-path-separator,
+.repository-file-path {
+    color: var(--colorNeutralForeground2);
+}
+
+.repository-file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+}
+
+.repository-file-header h2 {
+    margin: 0 0 0.2rem;
+    font-size: 1.1rem;
+}
+
+.repository-file-path {
+    font-size: 0.85rem;
+}
+
+.repository-file-metadata {
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+}
+
+.repository-file-metadata div {
+    min-width: 5rem;
+}
+
+.repository-file-metadata dt {
+    color: var(--colorNeutralForeground2);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.repository-file-metadata dd {
+    margin: 0.15rem 0 0;
+    font-size: 0.9rem;
+}
+
+.repository-file-content {
+    max-height: 70vh;
+    overflow: auto;
+    background: #fbfafc;
+}
+
+.repository-file-content pre {
+    min-width: max-content;
+    margin: 0;
+    padding: 1.25rem;
+    font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    tab-size: 4;
+}
+
+@media (max-width: 640px) {
+    .repository-file-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

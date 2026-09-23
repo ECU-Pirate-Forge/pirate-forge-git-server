@@ -1,62 +1,88 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<FluentCard>
+<FluentCard Class="data-grid-card">
     @if (Assignments.Count == 0)
     {
-        <p>No assignments have been created for this course.</p>
+        <div class="empty-state">No assignments have been created for this course.</div>
     }
     else
     {
-        <div class="repository-list">
-            @foreach (var assignment in Assignments)
-            {
-                <article>
-                    <h3>
-                        <FluentLink Href="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
-                            @assignment.Title
-                        </FluentLink>
-                    </h3>
-                    <p><code>@assignment.Slug</code></p>
-                    @if (!string.IsNullOrWhiteSpace(assignment.Description))
-                    {
-                        <p>@assignment.Description</p>
-                    }
-                    <p>
-                        Starter:
-                        @(assignment.Template?.DisplayName ?? "Blank repository")
-                    </p>
-                    <p>
-                        Due:
-                        @(assignment.DueAt?.ToString("f") ?? "No deadline")
-                    </p>
-                    <p>
-                        Repositories:
-                        @assignment.ProvisionedRepositoryCount of @assignment.StudentCount
-                    </p>
-                    @if (CanViewStatus)
-                    {
-                        <p>
-                            <FluentLink Href="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
-                                View repositories
-                            </FluentLink>
-                        </p>
-                    }
-                    @if (CanManage
-                        && assignment.ProvisionedRepositoryCount
-                            < assignment.StudentCount)
-                    {
-                        <form method="post"
-                              action="@($"/courses/{CourseId}/assignments/{assignment.Id}/repositories")">
-                            <AntiforgeryToken />
-                            <FluentButton Type="ButtonType.Submit"
-                                          Appearance="ButtonAppearance.Primary">
-                                Provision missing repositories
-                            </FluentButton>
-                        </form>
-                    }
-                </article>
-            }
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter assignments"
+                             Placeholder="Search title, slug, or starter"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredAssignments.Count assignment(s)</span>
         </div>
+        @if (filteredAssignments.Count == 0)
+        {
+            <div class="empty-state">No assignments match your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredAssignments.AsQueryable()"
+                                TGridItem="AssignmentResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <TemplateColumn Title="Assignment"
+                                    SortBy="@(GridSort<AssignmentResponse>.ByAscending(item => item.Title))">
+                        <FluentLink Href="@($"/courses/{CourseId}/assignments/{context.Id}/repositories")"
+                                    Class="grid-primary-link">
+                            @context.Title
+                        </FluentLink>
+                        @if (!string.IsNullOrWhiteSpace(context.Description))
+                        {
+                            <div class="grid-secondary-text">@context.Description</div>
+                        }
+                    </TemplateColumn>
+                    <PropertyColumn Property="@(item => item.Slug)"
+                                    Title="Slug"
+                                    Sortable="true" />
+                    <TemplateColumn Title="Starter"
+                                    SortBy="@(GridSort<AssignmentResponse>.ByAscending(item => item.Template == null ? string.Empty : item.Template.DisplayName))">
+                        @(context.Template?.DisplayName ?? "Blank repository")
+                    </TemplateColumn>
+                    <TemplateColumn Title="Due"
+                                    SortBy="@(GridSort<AssignmentResponse>.ByAscending(item => item.DueAt))">
+                        @(context.DueAt?.ToString("g") ?? "No deadline")
+                    </TemplateColumn>
+                    <TemplateColumn Title="Repositories"
+                                    SortBy="@(GridSort<AssignmentResponse>.ByAscending(item => item.ProvisionedRepositoryCount))">
+                        @context.ProvisionedRepositoryCount of @context.StudentCount
+                    </TemplateColumn>
+                    @if (CanViewStatus || CanManage)
+                    {
+                        <TemplateColumn Title="Actions">
+                            <div class="grid-actions">
+                                @if (CanViewStatus)
+                                {
+                                    <FluentAnchorButton Href="@($"/courses/{CourseId}/assignments/{context.Id}/repositories")"
+                                                        Appearance="ButtonAppearance.Outline">
+                                        View repositories
+                                    </FluentAnchorButton>
+                                }
+                                @if (CanManage
+                                    && context.ProvisionedRepositoryCount < context.StudentCount)
+                                {
+                                    <form method="post"
+                                          action="@($"/courses/{CourseId}/assignments/{context.Id}/repositories")">
+                                        <AntiforgeryToken />
+                                        <FluentButton Type="ButtonType.Submit"
+                                                      Appearance="ButtonAppearance.Primary">
+                                            Provision missing
+                                        </FluentButton>
+                                    </form>
+                                }
+                            </div>
+                        </TemplateColumn>
+                    }
+                </FluentDataGrid>
+            </div>
+        }
     }
 </FluentCard>
 
@@ -69,4 +95,17 @@
     [Parameter] public bool CanManage { get; set; }
 
     [Parameter] public bool CanViewStatus { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<AssignmentResponse> filteredAssignments =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Assignments
+            : Assignments.Where(assignment =>
+                    assignment.Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || assignment.Slug.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || assignment.Description.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || (assignment.Template?.DisplayName.Contains(
+                        filter,
+                        StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
 }

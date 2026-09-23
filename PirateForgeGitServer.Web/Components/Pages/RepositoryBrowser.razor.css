@@ -1,0 +1,26 @@
+.repository-header {
+    margin-bottom: 1rem;
+}
+
+.repository-eyebrow {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--ecu-purple);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.repository-actions {
+    flex-wrap: nowrap;
+    align-items: end;
+}
+
+@media (max-width: 720px) {
+    .repository-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        align-items: end;
+    }
+}

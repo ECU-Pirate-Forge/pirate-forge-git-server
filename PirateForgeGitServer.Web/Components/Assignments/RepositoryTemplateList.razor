@@ -1,4 +1,5 @@
-@using PirateForgeGitServer.Contracts.Git
+﻿@using PirateForgeGitServer.Contracts.Git
+@rendermode InteractiveServer
 
 @if (Templates.Count == 0)
 {
@@ -8,23 +9,64 @@
 }
 else
 {
-    <div class="repository-list">
-        @foreach (var template in Templates)
+    <FluentCard Class="data-grid-card">
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter templates"
+                             Placeholder="Search templates"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredTemplates.Count template(s)</span>
+        </div>
+        @if (filteredTemplates.Count == 0)
         {
-            <FluentCard>
-                <h2>@template.DisplayName</h2>
-                <p><code>@template.Name</code></p>
-                <p>
-                    <FluentLink Href="@($"/repositories/{template.Name}")">
-                        Browse repository
-                    </FluentLink>
-                </p>
-            </FluentCard>
+            <div class="empty-state">No templates match your filter.</div>
         }
-    </div>
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredTemplates.AsQueryable()"
+                                TGridItem="RepositoryTemplateResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <PropertyColumn Property="@(template => template.DisplayName)"
+                                    Title="Template"
+                                    Sortable="true"
+                                    IsDefaultSortColumn="true" />
+                    <PropertyColumn Property="@(template => template.Name)"
+                                    Title="Repository"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(template => template.Purpose)"
+                                    Title="Purpose"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(template => template.CreatedAt)"
+                                    Title="Created"
+                                    Format="d"
+                                    Sortable="true" />
+                    <TemplateColumn Title="Actions">
+                        <FluentAnchorButton Href="@($"/repositories/{context.Name}")"
+                                            Appearance="ButtonAppearance.Outline">
+                            Browse repository
+                        </FluentAnchorButton>
+                    </TemplateColumn>
+                </FluentDataGrid>
+            </div>
+        }
+    </FluentCard>
 }
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<RepositoryTemplateResponse> Templates { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<RepositoryTemplateResponse> filteredTemplates =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Templates
+            : Templates.Where(template =>
+                    template.DisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || template.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || template.Purpose.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 }

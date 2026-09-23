@@ -35,7 +35,7 @@
 }
 
 #main-menu {
-  padding-top: 12px;
+  padding: 1rem 0.75rem;
   height: 100%;
 }
 
@@ -48,12 +48,29 @@
   background: var(--ecu-purple);
   color: var(--ecu-white);
   min-height: 64px;
-  padding: 0 1rem;
+  padding: 0 1.25rem;
   border-bottom: 4px solid var(--ecu-gold);
   box-sizing: border-box;
 }
 
+.ecu-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--ecu-white);
+  text-decoration: none;
+}
+
+.ecu-brand:hover {
+  color: var(--ecu-white);
+}
+
+.ecu-brand img {
+  flex: 0 0 auto;
+}
+
 .ecu-header .ecu-title {
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -83,6 +100,17 @@
   border-right: 1px solid var(--colorNeutralStroke1);
 }
 
+.ecu-nav-menu fluent-nav-item::part(content) {
+  min-height: 46px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.ecu-nav-menu fluent-nav-item::part(content):hover {
+  background: rgba(89, 42, 138, 0.1);
+}
+
 .ecu-content {
   background: var(--ecu-white);
 }
@@ -108,9 +136,142 @@
 }
 
 .content {
-  padding: 0.5rem 1.5rem;
+  max-width: 1440px;
+  padding: 1.5rem 2rem 2.5rem;
   align-self: stretch !important;
   width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.35rem;
+  color: var(--ecu-purple-dark);
+  font-size: clamp(1.75rem, 3vw, 2.4rem);
+}
+
+.page-header p {
+  max-width: 70ch;
+  margin: 0;
+  color: var(--colorNeutralForeground2);
+}
+
+.page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+  color: var(--colorNeutralForeground2);
+  font-size: 0.9rem;
+}
+
+.form-panel {
+  display: block;
+  max-width: 720px;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+}
+
+.form-panel h2 {
+  margin-top: 0;
+}
+
+.course-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.data-grid-card {
+  display: block;
+  padding: 0;
+  overflow: hidden;
+}
+
+.grid-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--colorNeutralStroke1);
+  background: var(--colorNeutralBackground2);
+}
+
+.grid-toolbar fluent-text-input {
+  width: min(100%, 380px);
+}
+
+.grid-count {
+  color: var(--colorNeutralForeground2);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.data-grid-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.data-grid-scroll fluent-data-grid {
+  min-width: 760px;
+}
+
+.data-grid-scroll fluent-data-grid-cell {
+  padding-block: 0.7rem;
+}
+
+.grid-primary-link {
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.grid-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.grid-actions form {
+  display: inline-flex;
+  margin: 0;
+}
+
+.grid-secondary-text {
+  margin-top: 0.2rem;
+  color: var(--colorNeutralForeground2);
+  font-size: 0.875rem;
+}
+
+.assignment-progress {
+  padding: 1rem;
+  border-bottom: 1px solid var(--colorNeutralStroke1);
+  color: var(--colorNeutralForeground2);
+}
+
+.assignment-progress strong {
+  color: var(--ecu-purple);
+}
+
+.empty-state {
+  padding: 2rem 1rem;
+  color: var(--colorNeutralForeground2);
+  text-align: center;
 }
 
 #blazor-error-ui {
@@ -261,5 +422,28 @@ code {
   .course-tab-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .page-header,
+  .grid-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grid-toolbar fluent-text-input {
+    width: 100%;
+  }
+
+  .ecu-header .ecu-title {
+    font-size: 1.15rem;
+  }
+
+  .ecu-brand img {
+    width: 36px;
+    height: 36px;
   }
 }

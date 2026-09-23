@@ -28,7 +28,11 @@ public sealed class CourseWebEndpointTests
 
         page.EnsureSuccessStatusCode();
         var html = await page.Content.ReadAsStringAsync();
-        Assert.Contains("CS101 · Existing Course", html, StringComparison.Ordinal);
+        Assert.Contains("/images/pirate-forge-mark.svg", html, StringComparison.Ordinal);
+        Assert.Contains(">Pirate Forge</span>", html, StringComparison.Ordinal);
+        Assert.Contains("CS101", html, StringComparison.Ordinal);
+        Assert.Contains("Existing Course", html, StringComparison.Ordinal);
+        Assert.Contains("Filter repositories", html, StringComparison.Ordinal);
         Assert.Contains("Project One", html, StringComparison.Ordinal);
         Assert.Contains(
             "href=\"/courses/11111111-1111-1111-1111-111111111112/assignments/44444444-4444-4444-4444-444444444444/repositories\"",
@@ -88,9 +92,17 @@ public sealed class CourseWebEndpointTests
         page.EnsureSuccessStatusCode();
         var html = await page.Content.ReadAsStringAsync();
         Assert.Contains("Existing Course", html, StringComparison.Ordinal);
-        Assert.Contains("Create a course", html, StringComparison.Ordinal);
+        Assert.Contains("Add course", html, StringComparison.Ordinal);
+        Assert.DoesNotContain("Create a course", html, StringComparison.Ordinal);
+        Assert.Contains("Filter courses", html, StringComparison.Ordinal);
+        Assert.Contains("fluent-data-grid", html, StringComparison.Ordinal);
+
+        using var createPage = await client.GetAsync("/courses?action=create");
+        createPage.EnsureSuccessStatusCode();
+        var createHtml = await createPage.Content.ReadAsStringAsync();
+        Assert.Contains("Create a course", createHtml, StringComparison.Ordinal);
         var antiforgeryToken = Regex.Match(
-            html,
+            createHtml,
             "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"")
             .Groups[1]
             .Value;
@@ -232,7 +244,17 @@ public sealed class CourseWebEndpointTests
         var templatesHtml = await templatesPage.Content.ReadAsStringAsync();
         Assert.Contains("Repository Templates", templatesHtml, StringComparison.Ordinal);
         Assert.Contains("Project Starter", templatesHtml, StringComparison.Ordinal);
-        var templatesToken = GetAntiforgeryToken(templatesHtml);
+        Assert.Contains("Add template", templatesHtml, StringComparison.Ordinal);
+        Assert.DoesNotContain("Create template", templatesHtml, StringComparison.Ordinal);
+        Assert.Contains("fluent-data-grid", templatesHtml, StringComparison.Ordinal);
+
+        using var createTemplatePage = await client.GetAsync(
+            "/templates?action=create");
+        createTemplatePage.EnsureSuccessStatusCode();
+        var createTemplateHtml =
+            await createTemplatePage.Content.ReadAsStringAsync();
+        Assert.Contains("Create template", createTemplateHtml, StringComparison.Ordinal);
+        var templatesToken = GetAntiforgeryToken(createTemplateHtml);
         using var createTemplateResponse = await client.PostAsync(
             "/templates/create",
             new FormUrlEncodedContent(
@@ -265,11 +287,12 @@ public sealed class CourseWebEndpointTests
         Assert.Contains("?tab=activity", courseHtml, StringComparison.Ordinal);
         Assert.Contains("aria-current=\"page\"", courseHtml, StringComparison.Ordinal);
         Assert.Contains("Project One", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("fluent-data-grid", courseHtml, StringComparison.Ordinal);
         Assert.DoesNotContain("Download activity", courseHtml, StringComparison.Ordinal);
         Assert.DoesNotContain("course-staff-table", courseHtml, StringComparison.Ordinal);
         Assert.DoesNotContain("name=\"Slug\"", courseHtml, StringComparison.Ordinal);
         Assert.Contains("2 of 3", courseHtml, StringComparison.Ordinal);
-        Assert.Contains("Provision missing repositories", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("Provision missing", courseHtml, StringComparison.Ordinal);
         Assert.Contains("View repositories", courseHtml, StringComparison.Ordinal);
 
         using var createAssignmentPage = await client.GetAsync(
@@ -393,6 +416,8 @@ public sealed class CourseWebEndpointTests
         var statusHtml = await statusPage.Content.ReadAsStringAsync();
         Assert.Contains("Project One repositories", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Download all repositories", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("Filter repository status", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("fluent-data-grid", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Active Student", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Pending Student", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Not provisioned", statusHtml, StringComparison.Ordinal);
@@ -557,6 +582,14 @@ public sealed class CourseWebEndpointTests
             "data-enhance-nav=\"false\"",
             repositoryHtml,
             StringComparison.Ordinal);
+        Assert.Contains("Branch", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("Files", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("README.md", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("Markdown file", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("src", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("Directory", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("Recent commits", repositoryHtml, StringComparison.Ordinal);
+        Assert.Contains("Add starter", repositoryHtml, StringComparison.Ordinal);
 
         using var repositoryDownload = await client.GetAsync(
             "/repositories/cs101-project-1-active/download?branch=main");
@@ -1068,12 +1101,20 @@ public sealed class CourseWebEndpointTests
                 ("GET", "/api/repositories/cs101-project-1-active/tree") => (
                     HttpStatusCode.OK,
                     """
-                    [{
-                      "name": "README.md",
-                      "path": "README.md",
-                      "kind": "File",
-                      "size": 18
-                    }]
+                    [
+                      {
+                        "name": "README.md",
+                        "path": "README.md",
+                        "kind": "file",
+                        "size": 18
+                      },
+                      {
+                        "name": "src",
+                        "path": "src",
+                        "kind": "directory",
+                        "size": null
+                      }
+                    ]
                     """),
                 ("GET", "/api/repositories/cs101-project-1-active/commits") => (
                     HttpStatusCode.OK,

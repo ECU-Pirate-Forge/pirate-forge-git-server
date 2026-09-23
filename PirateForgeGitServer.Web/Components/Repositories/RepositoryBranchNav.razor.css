@@ -1,0 +1,7 @@
+.repository-branch-picker {
+    min-width: 13rem;
+}
+
+.repository-branch-picker ::deep fluent-select {
+    width: 100%;
+}

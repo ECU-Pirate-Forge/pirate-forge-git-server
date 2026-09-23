@@ -7,8 +7,21 @@
 
 <PageTitle>Courses</PageTitle>
 
-<h1>Courses</h1>
-<p>Create and manage the courses available to you.</p>
+<div class="page-header">
+    <div>
+        <h1>Courses</h1>
+        <p>Create and manage the courses available to you.</p>
+    </div>
+    <AuthorizeView Roles="Administrator,Instructor">
+        <Authorized>
+            <FluentAnchorButton Appearance="ButtonAppearance.Primary"
+                                Href="@(ShowCreateForm ? "/courses" : "/courses?action=create")"
+                                data-enhance-nav="false">
+                @(ShowCreateForm ? "Close form" : "Add course")
+            </FluentAnchorButton>
+        </Authorized>
+    </AuthorizeView>
+</div>
 
 @if (Error == "duplicate")
 {
@@ -25,24 +38,27 @@ else if (Error == "invalid")
 
 <AuthorizeView Roles="Administrator,Instructor">
     <Authorized>
-        <FluentCard>
-            <h2>Create a course</h2>
-            <form method="post" action="/courses/create" class="course-form">
-                <AntiforgeryToken />
-                <FluentTextInput Name="Code"
-                                 Label="Course code"
-                                 Required="true"
-                                 Width="100%" />
-                <FluentTextInput Name="Name"
-                                 Label="Course name"
-                                 Required="true"
-                                 Width="100%" />
-                <FluentButton Type="ButtonType.Submit"
-                              Appearance="ButtonAppearance.Primary">
-                    Create course
-                </FluentButton>
-            </form>
-        </FluentCard>
+        @if (ShowCreateForm)
+        {
+            <FluentCard Class="form-panel">
+                <h2>Create a course</h2>
+                <form method="post" action="/courses/create" class="course-form">
+                    <AntiforgeryToken />
+                    <FluentTextInput Name="Code"
+                                     Label="Course code"
+                                     Required="true"
+                                     Width="100%" />
+                    <FluentTextInput Name="Name"
+                                     Label="Course name"
+                                     Required="true"
+                                     Width="100%" />
+                    <FluentButton Type="ButtonType.Submit"
+                                  Appearance="ButtonAppearance.Primary">
+                        Create course
+                    </FluentButton>
+                </form>
+            </FluentCard>
+        }
     </Authorized>
 </AuthorizeView>
 
@@ -59,7 +75,10 @@ else
 
 @code {
     [SupplyParameterFromQuery] private string? Error { get; set; }
+    [SupplyParameterFromQuery(Name = "action")] private string? Action { get; set; }
     private IReadOnlyList<CourseResponse> courses = [];
+    private bool ShowCreateForm =>
+        Action == "create" || Error is "duplicate" or "invalid";
 
     protected override async Task OnInitializedAsync()
     {

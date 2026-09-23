@@ -1,0 +1,73 @@
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
+
+<FluentCard Class="data-grid-card">
+    <div class="grid-toolbar">
+        <FluentTextInput @bind-Value="filter"
+                         Label="Filter repositories"
+                         Placeholder="Search course or assignment"
+                         Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+        <span class="grid-count">@filteredRows.Count assignment(s)</span>
+    </div>
+    @if (filteredRows.Count == 0)
+    {
+        <div class="empty-state">No assignments match your filter.</div>
+    }
+    else
+    {
+        <div class="data-grid-scroll">
+            <FluentDataGrid Items="@filteredRows.AsQueryable()"
+                            TGridItem="CourseRepositoryRow"
+                            ResizableColumns="true"
+                            ShowHover="true">
+                <TemplateColumn Title="Course"
+                                SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Course.Code))">
+                    <FluentLink Href="@($"/courses/{context.Course.Id}")"
+                                Class="grid-primary-link">
+                        @context.Course.Code
+                    </FluentLink>
+                    <div class="grid-secondary-text">@context.Course.Name</div>
+                </TemplateColumn>
+                <TemplateColumn Title="Assignment"
+                                SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Assignment.Title))">
+                    <FluentLink Href="@($"/courses/{context.Course.Id}/assignments/{context.Assignment.Id}/repositories")"
+                                Class="grid-primary-link">
+                        @context.Assignment.Title
+                    </FluentLink>
+                </TemplateColumn>
+                <TemplateColumn Title="Slug"
+                                SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Assignment.Slug))">
+                    <code>@context.Assignment.Slug</code>
+                </TemplateColumn>
+                <TemplateColumn Title="Repositories"
+                                SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Assignment.ProvisionedRepositoryCount))">
+                    @context.Assignment.ProvisionedRepositoryCount of @context.Assignment.StudentCount
+                </TemplateColumn>
+                <TemplateColumn Title="Actions">
+                    <FluentAnchorButton Href="@($"/courses/{context.Course.Id}/assignments/{context.Assignment.Id}/repositories")"
+                                        Appearance="ButtonAppearance.Outline">
+                        View repositories
+                    </FluentAnchorButton>
+                </TemplateColumn>
+            </FluentDataGrid>
+        </div>
+    }
+</FluentCard>
+
+@code {
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<CourseRepositoryRow> Rows { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<CourseRepositoryRow> filteredRows =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Rows
+            : Rows.Where(row =>
+                    row.Course.Code.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || row.Course.Name.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || row.Assignment.Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || row.Assignment.Slug.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+}

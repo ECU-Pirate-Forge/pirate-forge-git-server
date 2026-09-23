@@ -1,76 +1,110 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<FluentCard>
-    <p>
-        @Status.ProvisionedRepositories of @Status.TotalStudents repositories
-        provisioned.
-    </p>
-
+<FluentCard Class="data-grid-card">
+    <div class="assignment-progress">
+        <strong>@Status.ProvisionedRepositories of @Status.TotalStudents</strong>
+        repositories provisioned
+    </div>
     @if (Status.Students.Count == 0)
     {
-        <p>No students are enrolled in this course.</p>
+        <div class="empty-state">No students are enrolled in this course.</div>
     }
     else
     {
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Student</th>
-                    <th>Status</th>
-                    <th>Repository</th>
-                    <th>Latest commit</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var student in Status.Students)
-                {
-                    <tr>
-                        <td>
-                            <strong>@student.StudentDisplayName</strong><br />
-                            @student.StudentEmail
-                        </td>
-                        <td>@FormatState(student.State)</td>
-                        <td>
-                            @if (student.RepositoryName is not null)
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter repository status"
+                             Placeholder="Search student, status, or repository"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredStudents.Count student(s)</span>
+        </div>
+        @if (filteredStudents.Count == 0)
+        {
+            <div class="empty-state">No repository statuses match your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredStudents.AsQueryable()"
+                                TGridItem="StudentAssignmentStatusResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <TemplateColumn Title="Student"
+                                    SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student => student.StudentDisplayName))">
+                        <strong>@context.StudentDisplayName</strong>
+                        <div class="grid-secondary-text">@context.StudentEmail</div>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Status"
+                                    SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student => student.State))">
+                        @FormatState(context.State)
+                    </TemplateColumn>
+                    <TemplateColumn Title="Repository"
+                                    SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student => student.RepositoryName ?? string.Empty))">
+                        @if (context.RepositoryName is not null)
+                        {
+                            <FluentLink Href="@($"/repositories/{context.RepositoryName}")">
+                                @(context.RepositoryDisplayName ?? context.RepositoryName)
+                            </FluentLink>
+                            @if (context.Branch is not null)
                             {
-                                <FluentLink Href="@($"/repositories/{student.RepositoryName}")">
-                                    @student.RepositoryName
-                                </FluentLink>
-                                @if (student.Branch is not null)
-                                {
-                                    <div>Branch: @student.Branch</div>
-                                }
+                                <div class="grid-secondary-text">Branch: @context.Branch</div>
                             }
-                            else
-                            {
-                                <span>Not available</span>
-                            }
-                        </td>
-                        <td>
-                            @if (student.LatestCommit is not null)
-                            {
-                                <strong>@student.LatestCommit.Subject</strong>
-                                <div>
-                                    @student.LatestCommit.AuthorName ·
-                                    @student.LatestCommit.AuthoredAt.ToString("g")
-                                </div>
-                                <code>@student.LatestCommit.Id[..Math.Min(8, student.LatestCommit.Id.Length)]</code>
-                            }
-                            else
-                            {
-                                <span>No commits</span>
-                            }
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+                        }
+                        else
+                        {
+                            <span>Not available</span>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Title="Latest commit"
+                                    SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student =>
+                                        student.LatestCommit == null ? DateTimeOffset.MinValue : student.LatestCommit.AuthoredAt))">
+                        @if (context.LatestCommit is not null)
+                        {
+                            <strong>@context.LatestCommit.Subject</strong>
+                            <div class="grid-secondary-text">
+                                @context.LatestCommit.AuthorName · @context.LatestCommit.AuthoredAt.ToString("g")
+                            </div>
+                            <code>@context.LatestCommit.Id[..Math.Min(8, context.LatestCommit.Id.Length)]</code>
+                        }
+                        else
+                        {
+                            <span>No commits</span>
+                        }
+                    </TemplateColumn>
+                    <TemplateColumn Title="Actions">
+                        @if (context.RepositoryName is not null)
+                        {
+                            <FluentAnchorButton Href="@($"/repositories/{context.RepositoryName}")"
+                                                Appearance="ButtonAppearance.Outline">
+                                Browse repository
+                            </FluentAnchorButton>
+                        }
+                    </TemplateColumn>
+                </FluentDataGrid>
+            </div>
+        }
     }
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required AssignmentStatusResponse Status { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<StudentAssignmentStatusResponse> filteredStudents =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Status.Students
+            : Status.Students.Where(student =>
+                    student.StudentDisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || student.StudentEmail.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || FormatState(student.State).Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || (student.RepositoryName?.Contains(
+                        filter,
+                        StringComparison.OrdinalIgnoreCase) ?? false))
+                .ToList();
 
     private static string FormatState(string state) =>
         state switch

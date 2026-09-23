@@ -13,9 +13,17 @@
 
 @if (course is not null)
 {
-    <p><FluentLink Href="/courses">Courses</FluentLink> / @course.Code</p>
-    <h1>@course.Name</h1>
-    <p>@course.Code</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+        <FluentLink Href="/courses">Courses</FluentLink>
+        <span aria-hidden="true">/</span>
+        <span>@course.Code</span>
+    </nav>
+    <div class="page-header">
+        <div>
+            <h1>@course.Name</h1>
+            <p>@course.Code</p>
+        </div>
+    </div>
 
     @if (Error == "invalid-assignment")
     {

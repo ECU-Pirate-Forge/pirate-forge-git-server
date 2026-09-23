@@ -7,7 +7,32 @@
 
 <PageTitle>@Name · Repository</PageTitle>
 
-<h1>@Name</h1>
+<nav class="breadcrumb" aria-label="Breadcrumb">
+    <FluentLink Href="/repositories">Repositories</FluentLink>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">@Name</span>
+</nav>
+
+<header class="page-header repository-header">
+    <div>
+        <span class="repository-eyebrow">Git repository</span>
+        <h1>@Name</h1>
+        <p>Browse source files and recent changes across repository branches.</p>
+    </div>
+    @if (branches.Count > 0)
+    {
+        <div class="page-actions repository-actions">
+            <RepositoryBranchNav RepositoryName="@Name"
+                                 Branches="@branches"
+                                 SelectedBranch="@selectedBranch" />
+            <FluentAnchorButton Appearance="ButtonAppearance.Primary"
+                                Href="@($"/repositories/{Name}/download?branch={Uri.EscapeDataString(selectedBranch)}")"
+                                data-enhance-nav="false">
+                Download ZIP
+            </FluentAnchorButton>
+        </div>
+    }
+</header>
 
 @if (branches.Count == 0)
 {
@@ -17,20 +42,11 @@
 }
 else
 {
-    <RepositoryBranchNav RepositoryName="@Name"
-                         Branches="@branches"
-                         SelectedBranch="@selectedBranch" />
-
-    <FluentSpacer />
-    <FluentAnchorButton Appearance="ButtonAppearance.Primary"
-                        Href="@($"/repositories/{Name}/download?branch={Uri.EscapeDataString(selectedBranch)}")"
-                        data-enhance-nav="false">
-        Download ZIP
-    </FluentAnchorButton>
-
     @if (file is not null)
     {
-        <RepositoryFileView File="@file" />
+        <RepositoryFileView RepositoryName="@Name"
+                            Branch="@selectedBranch"
+                            File="@file" />
     }
     else
     {

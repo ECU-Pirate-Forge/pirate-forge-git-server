@@ -1,21 +1,66 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<div class="course-grid">
-    @foreach (var course in Courses)
+<FluentCard Class="data-grid-card">
+    <div class="grid-toolbar">
+        <FluentTextInput @bind-Value="filter"
+                         Label="Filter courses"
+                         Placeholder="Search by course code or name"
+                         Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+        <span class="grid-count">@filteredCourses.Count course(s)</span>
+    </div>
+    @if (filteredCourses.Count == 0)
     {
-        <FluentCard class="course-card">
-            <p><strong>@course.Code</strong></p>
-            <h2>
-                <FluentLink Href="@($"/courses/{course.Id}")">
-                    @course.Name
-                </FluentLink>
-            </h2>
-            <p>@course.Staff.Count staff member(s)</p>
-        </FluentCard>
+        <div class="empty-state">No courses match your filter.</div>
     }
-</div>
+    else
+    {
+        <div class="data-grid-scroll">
+            <FluentDataGrid Items="@filteredCourses.AsQueryable()"
+                            TGridItem="CourseResponse"
+                            ResizableColumns="true"
+                            ShowHover="true">
+                <PropertyColumn Property="@(course => course.Code)"
+                                Title="Code"
+                                Sortable="true"
+                                IsDefaultSortColumn="true" />
+                <TemplateColumn Title="Course"
+                                SortBy="@(GridSort<CourseResponse>.ByAscending(course => course.Name))">
+                    <FluentLink Href="@($"/courses/{context.Id}")"
+                                Class="grid-primary-link">
+                        @context.Name
+                    </FluentLink>
+                </TemplateColumn>
+                <PropertyColumn Property="@(course => course.Staff.Count)"
+                                Title="Staff"
+                                Sortable="true" />
+                <PropertyColumn Property="@(course => course.CreatedAt)"
+                                Title="Created"
+                                Format="d"
+                                Sortable="true" />
+                <TemplateColumn Title="Actions">
+                    <FluentAnchorButton Href="@($"/courses/{context.Id}")"
+                                        Appearance="ButtonAppearance.Outline">
+                        View course
+                    </FluentAnchorButton>
+                </TemplateColumn>
+            </FluentDataGrid>
+        </div>
+    }
+</FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<CourseResponse> Courses { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<CourseResponse> filteredCourses =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Courses
+            : Courses.Where(course =>
+                    course.Code.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || course.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 }

@@ -6,7 +6,13 @@
 <FluentLayout Class="ecu-app-shell">
     <FluentLayoutItem Area="LayoutArea.Header" Class="ecu-header">
         <FluentLayoutHamburger />
-        <span class="ecu-title">Pirate Forge Git Server</span>
+        <a class="ecu-brand" href="/" aria-label="Pirate Forge home">
+            <img src="/images/pirate-forge-mark.svg"
+                 alt=""
+                 width="42"
+                 height="42" />
+            <span class="ecu-title">Pirate Forge</span>
+        </a>
         <FluentSpacer />
         <AuthorizeView>
             <Authorized Context="authenticationState">
