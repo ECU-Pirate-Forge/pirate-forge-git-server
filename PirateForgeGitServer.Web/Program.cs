@@ -28,6 +28,10 @@ builder.Services.AddRazorComponents()
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 
+var apiPort = builder.Configuration["Parameters:api_port"] ?? "8080";
+
+
+
 var storageRoot = builder.Configuration["PirateForge:Storage:RootPath"]
     ?? Path.GetFullPath(
         Path.Combine(builder.Environment.ContentRootPath, "..", ".pirateforge"));
@@ -73,25 +77,16 @@ builder.Services.AddOutputCache();
 
 
 builder.Services.AddHttpClient<IdentityApiClient>(client =>
-    client.BaseAddress = new("https+http://apiservice"));
+    client.BaseAddress = new("http://apiservice"));
 builder.Services.AddHttpClient<PersonalAccessTokenApiClient>(client =>
-    client.BaseAddress = new("https+http://apiservice"));
+    client.BaseAddress = new("http://apiservice"));
 builder.Services.AddHttpClient<RepositoryApiClient>(client =>
-    client.BaseAddress = new("https+http://apiservice"));
+    client.BaseAddress = new("http://apiservice"));
 builder.Services.AddHttpClient<CourseApiClient>(client =>
-    client.BaseAddress = new("https+http://apiservice"));
+    client.BaseAddress = new("http://apiservice"));
 builder.Services.AddHttpClient<AssignmentApiClient>(client =>
-    client.BaseAddress = new("https+http://apiservice"));
+    client.BaseAddress = new("http://apiservice"));
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin()
-               .AllowAnyMethod()
-               .AllowAnyHeader();
-    });
-});
 
 var app = builder.Build();
 
@@ -104,7 +99,6 @@ if (!app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();

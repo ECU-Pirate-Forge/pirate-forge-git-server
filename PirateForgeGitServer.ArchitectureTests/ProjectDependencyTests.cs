@@ -123,6 +123,37 @@ public sealed class ProjectDependencyTests
     }
 
     [Fact]
+    public void AppHostHealthChecksUseHttpEndpoints()
+    {
+        var appHost = File.ReadAllText(
+            Path.Combine(
+                FindSolutionRoot(),
+                "PirateForgeGitServer.AppHost",
+                "AppHost.cs"));
+
+        Assert.Equal(
+            2,
+            appHost.Split(
+                ".WithHttpHealthCheck(\"/health\", endpointName: \"http\")",
+                StringSplitOptions.None).Length - 1);
+    }
+
+    [Fact]
+    public void WebApiClientsUseHttpServiceDiscovery()
+    {
+        var webProgram = File.ReadAllText(
+            Path.Combine(
+                FindSolutionRoot(),
+                "PirateForgeGitServer.Web",
+                "Program.cs"));
+
+        Assert.DoesNotContain("https+http://apiservice", webProgram, StringComparison.Ordinal);
+        Assert.Equal(
+            5,
+            webProgram.Split("http://apiservice", StringSplitOptions.None).Length - 1);
+    }
+
+    [Fact]
     public void ApiContainerIncludesGitAndRunsAsNonRoot()
     {
         var solutionRoot = FindSolutionRoot();

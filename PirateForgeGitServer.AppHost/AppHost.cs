@@ -1,100 +1,101 @@
-using Aspire.Hosting.Docker;
-using Aspire.Hosting.Docker.Resources.ServiceNodes;
+// using Aspire.Hosting.Docker;
+// using Aspire.Hosting.Docker.Resources.ServiceNodes;
 
-var builder = DistributedApplication.CreateBuilder(args);
+IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-var storageRoot = Path.GetFullPath(
+// var storageRoot = Path.GetFullPath(
+//     Path.Combine(builder.AppHostDirectory, "..", ".pirateforge"));
+// const string containerStorageRoot = "/srv/pirateforge";
+// var configuredStorageRoot = builder.ExecutionContext.IsPublishMode
+//     ? containerStorageRoot
+//     : storageRoot;
+
+string webPort = Environment.GetEnvironmentVariable("Parameters__web_port") ?? "8080";
+string apiPort = Environment.GetEnvironmentVariable("Parameters__api_port") ?? "8080";
+string configuredStorageRoot = Environment.GetEnvironmentVariable("Parameters__storage_root") ?? Path.GetFullPath(
     Path.Combine(builder.AppHostDirectory, "..", ".pirateforge"));
-const string containerStorageRoot = "/var/lib/pirateforge";
-var configuredStorageRoot = builder.ExecutionContext.IsPublishMode
-    ? containerStorageRoot
-    : storageRoot;
+string allowedHosts = Environment.GetEnvironmentVariable("Parameters__allowed_hosts") ?? "*";
+string bootstrapAdminEmail = Environment.GetEnvironmentVariable("Parameters__bootstrap_admin_email") ?? "";
+string bootstrapAdminDisplayName = Environment.GetEnvironmentVariable("Parameters__bootstrap_admin_display_name") ?? "";
+string bootstrapAdminPassword = Environment.GetEnvironmentVariable("Parameters__bootstrap_admin_password") ?? "";
 
-var migrationWorker = builder.AddProject<Projects.PirateForgeGitServer_Worker>("migrationworker")
-    .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot);
 
-var apiService = builder.AddProject<Projects.PirateForgeGitServer_ApiService>("apiservice")
+IResourceBuilder<ProjectResource> migrationWorker = builder.AddProject<Projects.PirateForgeGitServer_Worker>("migrationworker")
+    .WithEnvironment("PirateForge__Bootstrap_Admin_Email", bootstrapAdminEmail)
+    .WithEnvironment("PirateForge__Bootstrap_Admin_Display_Name", bootstrapAdminDisplayName)
     .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot)
-    .WithHttpHealthCheck("/health")
+    .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http");
+
+IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.PirateForgeGitServer_ApiService>("apiservice")
+    .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot)
+    .WithEnvironment("PirateForge__Api_Port", apiPort)
+    .WithEnvironment("PirateForge__Allowed_Hosts", allowedHosts)
+    .WithEnvironment("PirateForge__Bootstrap_Admin_Email", bootstrapAdminEmail)
+    .WithEnvironment("PirateForge__Bootstrap_Admin_Display_Name", bootstrapAdminDisplayName)
+    .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http")
+    .WithHttpHealthCheck("/health", endpointName: "http")
     .WaitFor(migrationWorker);
 
-var webFrontend = builder.AddProject<Projects.PirateForgeGitServer_Web>("webfrontend")
-    .WithEnvironment("PirateForge__Storage__RootPath", configuredStorageRoot)
+IResourceBuilder<ProjectResource> webFrontend = builder.AddProject<Projects.PirateForgeGitServer_Web>("webfrontend")
+    .WithEnvironment("PirateForge__Web_Port", webPort)
     .WithExternalHttpEndpoints()
-    .WithHttpHealthCheck("/health")
+    .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http")
+    .WithHttpHealthCheck("/health", endpointName: "http")
     .WithReference(apiService)
     .WaitFor(apiService);
 
-if (builder.ExecutionContext.IsPublishMode)
-{
-    var dockerCompose = builder.AddDockerComposeEnvironment("docker-compose")
-        .WithDashboard(false);
+// if (builder.ExecutionContext.IsPublishMode)
+// {
+    // var dockerCompose = builder.AddDockerComposeEnvironment("docker-compose")
+    //     .WithDashboard(false);
 
-    var deploymentStoragePath = builder.AddParameter("storage-path");
-    var allowedHosts = builder.AddParameter("allowed-hosts");
-    var webPort = builder.AddParameter("web-port");
-    var gitPort = builder.AddParameter("git-port");
-    var bootstrapAdminEmail = builder.AddParameter("bootstrap-admin-email");
-    var bootstrapAdminPassword = builder.AddParameter(
-        "bootstrap-admin-password",
-        secret: true);
-    var bootstrapAdminDisplayName = builder.AddParameter(
-        "bootstrap-admin-display-name");
+
     
-    apiService
-        .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http")
-        .PublishAsDockerFile(container =>
-            container.WithDockerfile(
-                "..",
-                "PirateForgeGitServer.ApiService/Dockerfile"))
-        .PublishAsDockerComposeService((resource, service) =>
-        {
-            service.Restart = "unless-stopped";
-            service.Environment["AllowedHosts"] =
-                $"apiservice;{allowedHosts.AsEnvironmentPlaceholder(resource)}";
-            service.Ports.Add(
-                $"127.0.0.1:{gitPort.AsEnvironmentPlaceholder(resource)}:8080");
-            service.Networks.Add("pirateforge-network");
-            service.Volumes.Add(
-                new Volume
-                {
-                    Name = "pirateforge-storage",
-                    Type = "bind",
-                    Source = deploymentStoragePath.AsEnvironmentPlaceholder(resource),
-                    Target = containerStorageRoot,
-                });
-        })
-        .WithEnvironment(
-            "PirateForge__BootstrapAdmin__Email",
-            bootstrapAdminEmail)
-        .WithEnvironment(
-            "PirateForge__BootstrapAdmin__Password",
-            bootstrapAdminPassword)
-        .WithEnvironment(
-            "PirateForge__BootstrapAdmin__DisplayName",
-            bootstrapAdminDisplayName);
+    // apiService
+    //     .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http");
+        // .PublishAsDockerFile(container =>
+        //     container.WithDockerfile(
+        //         "..",
+        //         "PirateForgeGitServer.ApiService/Dockerfile"))
+        // .PublishAsDockerComposeService((resource, service) =>
+        // {
+        //     service.Restart = "unless-stopped";
+        //     service.Environment["AllowedHosts"] =
+        //         $"apiservice;{allowedHosts.AsEnvironmentPlaceholder(resource)}";
+        //     service.Ports.Add(
+        //         $"127.0.0.1:{gitPort.AsEnvironmentPlaceholder(resource)}:8080");
+        //     service.Networks.Add("pirateforge-network");
+        //     service.Volumes.Add(
+        //         new Volume
+        //         {
+        //             Name = "pirateforge-storage",
+        //             Type = "bind",
+        //             Source = deploymentStoragePath.AsEnvironmentPlaceholder(resource),
+        //             Target = containerStorageRoot,
+        //         });
+        // })
+
     
-    webFrontend
-        .WithEnvironment("AllowedHosts", allowedHosts)
-        .WithEnvironment("HTTP_PORTS", "8080")
-        .PublishAsDockerComposeService((resource, service) =>
-        {
-            service.Restart = "unless-stopped";
-            service.Ports.Clear();
-            service.Ports.Add(
-                $"127.0.0.1:{webPort.AsEnvironmentPlaceholder(resource)}:8080");
-            service.Environment.Remove("APISERVICE_HTTPS");
-            service.Networks.Add("pirateforge-network");
-            service.Volumes.Add(
-                new Volume
-                {
-                    Name = "pirateforge-web-keys",
-                    Type = "bind",
-                    Source =
-                        $"{deploymentStoragePath.AsEnvironmentPlaceholder(resource)}/data-protection-keys/web",
-                    Target = $"{containerStorageRoot}/data-protection-keys/web",
-                });
-        });      
-}
+    // webFrontend
+    //     .WithEndpointsInEnvironment(endpoint => endpoint.UriScheme == "http");
+        // .PublishAsDockerComposeService((resource, service) =>
+        // {
+        //     service.Restart = "unless-stopped";
+        //     service.Ports.Clear();
+        //     service.Ports.Add(
+        //         $"127.0.0.1:{webPort.AsEnvironmentPlaceholder(resource)}:8080");
+        //     service.Environment.Remove("APISERVICE_HTTPS");
+        //     service.Networks.Add("pirateforge-network");
+        //     service.Volumes.Add(
+        //         new Volume
+        //         {
+        //             Name = "pirateforge-web-keys",
+        //             Type = "bind",
+        //             Source =
+        //                 $"{deploymentStoragePath.AsEnvironmentPlaceholder(resource)}/data-protection-keys/web",
+        //             Target = $"{containerStorageRoot}/data-protection-keys/web",
+        //         });
+        // });      
+// }
 
 builder.Build().Run();

@@ -7,6 +7,17 @@ using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+var apiPort = builder.Configuration["pirateforge:api_port"] ?? "8080";
+var storagePath = builder.Configuration["pirateforge:storage_path"] ?? Path.GetFullPath(
+    Path.Combine(builder.Environment.ContentRootPath, "..", ".pirateforge"));
+var webPort = builder.Configuration["pirateforge:web_port"] ?? "8080";
+var allowedHosts = builder.Configuration["pirateforge:allowed_hosts"] ?? "*";
+var bootstrapAdminEmail = builder.Configuration["pirateforge:bootstrap_admin_email"];
+var bootstrapAdminDisplayName = builder.Configuration["pirateforge:bootstrap_admin_display_name"];
+
+
+
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 

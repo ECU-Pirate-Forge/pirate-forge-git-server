@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Condition="$([System.String]::Copy('$(MSBuildProjectName)').StartsWith('PirateForgeGitServer'))">
-    <TargetFramework>net11.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
