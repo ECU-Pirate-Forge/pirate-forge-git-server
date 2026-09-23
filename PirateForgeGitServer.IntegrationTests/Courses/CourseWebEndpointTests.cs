@@ -287,6 +287,8 @@ public sealed class CourseWebEndpointTests
         Assert.Contains("?tab=activity", courseHtml, StringComparison.Ordinal);
         Assert.Contains("aria-current=\"page\"", courseHtml, StringComparison.Ordinal);
         Assert.Contains("Project One", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("Description", courseHtml, StringComparison.Ordinal);
+        Assert.Contains("First project", courseHtml, StringComparison.Ordinal);
         Assert.Contains("fluent-data-grid", courseHtml, StringComparison.Ordinal);
         Assert.DoesNotContain("Download activity", courseHtml, StringComparison.Ordinal);
         Assert.DoesNotContain("course-staff-table", courseHtml, StringComparison.Ordinal);
@@ -399,6 +401,11 @@ public sealed class CourseWebEndpointTests
             "All assignment repositories",
             activityHtml,
             StringComparison.Ordinal);
+        Assert.Contains("Email", activityHtml, StringComparison.Ordinal);
+        Assert.Contains(
+            "instructor@example.edu",
+            activityHtml,
+            StringComparison.Ordinal);
 
         using var invalidTabPage = await client.GetAsync(
             "/courses/11111111-1111-1111-1111-111111111112?tab=unknown");
@@ -419,7 +426,15 @@ public sealed class CourseWebEndpointTests
         Assert.Contains("Filter repository status", statusHtml, StringComparison.Ordinal);
         Assert.Contains("fluent-data-grid", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Active Student", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("active@example.edu", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Pending Student", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("Email", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("Branch", statusHtml, StringComparison.Ordinal);
+        Assert.Contains("main", statusHtml, StringComparison.Ordinal);
+        Assert.Contains(
+            "Project One - Active Student",
+            statusHtml,
+            StringComparison.Ordinal);
         Assert.Contains("Not provisioned", statusHtml, StringComparison.Ordinal);
         Assert.Contains("Add starter", statusHtml, StringComparison.Ordinal);
         Assert.Contains(

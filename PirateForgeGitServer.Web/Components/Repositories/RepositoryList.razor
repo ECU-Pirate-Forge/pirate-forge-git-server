@@ -27,7 +27,8 @@
                 <FluentDataGrid Items="@filteredRepositories.AsQueryable()"
                                 TGridItem="RepositoryResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <TemplateColumn Title="Repository"
                                     SortBy="@(GridSort<RepositoryResponse>.ByAscending(repository => repository.DisplayName))">
                         <FluentLink Href="@($"/repositories/{context.Name}")"

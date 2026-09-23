@@ -31,12 +31,15 @@
                 <FluentDataGrid Items="@filteredStudents.AsQueryable()"
                                 TGridItem="StudentAssignmentStatusResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <TemplateColumn Title="Student"
                                     SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student => student.StudentDisplayName))">
                         <strong>@context.StudentDisplayName</strong>
-                        <div class="grid-secondary-text">@context.StudentEmail</div>
                     </TemplateColumn>
+                    <PropertyColumn Property="@(student => student.StudentEmail)"
+                                    Title="Email"
+                                    Sortable="true" />
                     <TemplateColumn Title="Status"
                                     SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student => student.State))">
                         @FormatState(context.State)
@@ -48,16 +51,15 @@
                             <FluentLink Href="@($"/repositories/{context.RepositoryName}")">
                                 @(context.RepositoryDisplayName ?? context.RepositoryName)
                             </FluentLink>
-                            @if (context.Branch is not null)
-                            {
-                                <div class="grid-secondary-text">Branch: @context.Branch</div>
-                            }
                         }
                         else
                         {
                             <span>Not available</span>
                         }
                     </TemplateColumn>
+                    <PropertyColumn Property="@(student => student.Branch)"
+                                    Title="Branch"
+                                    Sortable="true" />
                     <TemplateColumn Title="Latest commit"
                                     SortBy="@(GridSort<StudentAssignmentStatusResponse>.ByAscending(student =>
                                         student.LatestCommit == null ? DateTimeOffset.MinValue : student.LatestCommit.AuthoredAt))">
@@ -102,6 +104,12 @@
                     || student.StudentEmail.Contains(filter, StringComparison.OrdinalIgnoreCase)
                     || FormatState(student.State).Contains(filter, StringComparison.OrdinalIgnoreCase)
                     || (student.RepositoryName?.Contains(
+                        filter,
+                        StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (student.RepositoryDisplayName?.Contains(
+                        filter,
+                        StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (student.Branch?.Contains(
                         filter,
                         StringComparison.OrdinalIgnoreCase) ?? false))
                 .ToList();

@@ -27,18 +27,18 @@
                 <FluentDataGrid Items="@filteredAssignments.AsQueryable()"
                                 TGridItem="AssignmentResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <TemplateColumn Title="Assignment"
                                     SortBy="@(GridSort<AssignmentResponse>.ByAscending(item => item.Title))">
                         <FluentLink Href="@($"/courses/{CourseId}/assignments/{context.Id}/repositories")"
                                     Class="grid-primary-link">
                             @context.Title
                         </FluentLink>
-                        @if (!string.IsNullOrWhiteSpace(context.Description))
-                        {
-                            <div class="grid-secondary-text">@context.Description</div>
-                        }
                     </TemplateColumn>
+                    <PropertyColumn Property="@(item => item.Description)"
+                                    Title="Description"
+                                    Sortable="true" />
                     <PropertyColumn Property="@(item => item.Slug)"
                                     Title="Slug"
                                     Sortable="true" />

@@ -29,7 +29,8 @@ else
                 <FluentDataGrid Items="@filteredTemplates.AsQueryable()"
                                 TGridItem="RepositoryTemplateResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <PropertyColumn Property="@(template => template.DisplayName)"
                                     Title="Template"
                                     Sortable="true"

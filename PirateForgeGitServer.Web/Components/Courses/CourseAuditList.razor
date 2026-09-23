@@ -27,7 +27,8 @@
                 <FluentDataGrid Items="@filteredEvents.AsQueryable()"
                                 TGridItem="CourseAuditEventResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <PropertyColumn Property="@(auditEvent => auditEvent.CreatedAt)"
                                     Title="When"
                                     Format="g"
@@ -37,8 +38,10 @@
                     <TemplateColumn Title="User"
                                     SortBy="@(GridSort<CourseAuditEventResponse>.ByAscending(auditEvent => auditEvent.ActorDisplayName))">
                         <strong>@context.ActorDisplayName</strong>
-                        <div class="grid-secondary-text">@context.ActorEmail</div>
                     </TemplateColumn>
+                    <PropertyColumn Property="@(auditEvent => auditEvent.ActorEmail)"
+                                    Title="Email"
+                                    Sortable="true" />
                     <TemplateColumn Title="Download"
                                     SortBy="@(GridSort<CourseAuditEventResponse>.ByAscending(auditEvent =>
                                         auditEvent.Action == "AssignmentArchiveDownloaded"

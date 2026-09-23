@@ -27,7 +27,8 @@
                 <FluentDataGrid Items="@filteredStudents.AsQueryable()"
                                 TGridItem="CourseStudentResponse"
                                 ResizableColumns="true"
-                                ShowHover="true">
+                                ShowHover="true"
+                                MultiLine="true">
                     <PropertyColumn Property="@(student => student.DisplayName)"
                                     Title="Name"
                                     Sortable="true"

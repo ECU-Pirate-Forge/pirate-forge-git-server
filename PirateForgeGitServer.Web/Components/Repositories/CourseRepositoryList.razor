@@ -21,15 +21,18 @@
             <FluentDataGrid Items="@filteredRows.AsQueryable()"
                             TGridItem="CourseRepositoryRow"
                             ResizableColumns="true"
-                            ShowHover="true">
-                <TemplateColumn Title="Course"
+                            ShowHover="true"
+                            MultiLine="true">
+                <TemplateColumn Title="Code"
                                 SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Course.Code))">
                     <FluentLink Href="@($"/courses/{context.Course.Id}")"
                                 Class="grid-primary-link">
                         @context.Course.Code
                     </FluentLink>
-                    <div class="grid-secondary-text">@context.Course.Name</div>
                 </TemplateColumn>
+                <PropertyColumn Property="@(row => row.Course.Name)"
+                                Title="Course"
+                                Sortable="true" />
                 <TemplateColumn Title="Assignment"
                                 SortBy="@(GridSort<CourseRepositoryRow>.ByAscending(row => row.Assignment.Title))">
                     <FluentLink Href="@($"/courses/{context.Course.Id}/assignments/{context.Assignment.Id}/repositories")"
