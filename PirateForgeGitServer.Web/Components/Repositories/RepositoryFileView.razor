@@ -1,12 +1,69 @@
 @using PirateForgeGitServer.Contracts.Git
 
-<FluentCard>
-    <h2>@File.Path</h2>
-    <p>@File.Size.ToString("N0") bytes · @File.Language</p>
-    <pre class="file-content"><code>@File.Content</code></pre>
+<FluentCard Class="repository-panel repository-file-panel">
+    <nav class="repository-path" aria-label="Repository path">
+        <FluentLink Href="@RootUrl">Root</FluentLink>
+        @foreach (var crumb in ParentBreadcrumbs)
+        {
+            <span class="repository-path-separator" aria-hidden="true">/</span>
+            <FluentLink Href="@crumb.Url">@crumb.Name</FluentLink>
+        }
+        <span class="repository-path-separator" aria-hidden="true">/</span>
+        <span aria-current="page">@FileName</span>
+    </nav>
+
+    <div class="repository-file-header">
+        <div>
+            <h2>@FileName</h2>
+            <span class="repository-file-path">@File.Path</span>
+        </div>
+        <dl class="repository-file-metadata">
+            <div>
+                <dt>Language</dt>
+                <dd>@(string.IsNullOrWhiteSpace(File.Language) ? "Text" : File.Language)</dd>
+            </div>
+            <div>
+                <dt>Size</dt>
+                <dd>@File.Size.ToString("N0") bytes</dd>
+            </div>
+        </dl>
+    </div>
+
+    <div class="repository-file-content">
+        <pre><code>@File.Content</code></pre>
+    </div>
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired]
+    public required string RepositoryName { get; set; }
+
+    [Parameter, EditorRequired]
+    public required string Branch { get; set; }
+
+    [Parameter, EditorRequired]
     public required RepositoryFileResponse File { get; set; }
+
+    private string RootUrl =>
+        $"/repositories/{RepositoryName}?branch={Uri.EscapeDataString(Branch)}";
+
+    private string FileName =>
+        File.Path.Split('/', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()
+        ?? File.Path;
+
+    private IEnumerable<(string Name, string Url)> ParentBreadcrumbs
+    {
+        get
+        {
+            var segments = File.Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var current = string.Empty;
+            foreach (var segment in segments.Take(Math.Max(0, segments.Length - 1)))
+            {
+                current = string.IsNullOrEmpty(current) ? segment : $"{current}/{segment}";
+                yield return (
+                    segment,
+                    $"{RootUrl}&path={Uri.EscapeDataString(current)}");
+            }
+        }
+    }
 }

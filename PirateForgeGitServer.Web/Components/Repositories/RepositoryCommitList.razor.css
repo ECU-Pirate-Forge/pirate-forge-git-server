@@ -1,0 +1,91 @@
+.repository-panel {
+    display: block;
+    margin-bottom: 1rem;
+    padding: 0;
+    overflow: hidden;
+}
+
+.repository-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+    background: var(--colorNeutralBackground2);
+}
+
+.repository-panel-header h2 {
+    margin: 0;
+    font-size: 1.05rem;
+}
+
+.repository-panel-header span {
+    display: block;
+    margin-top: 0.1rem;
+    color: var(--colorNeutralForeground2);
+    font-size: 0.82rem;
+}
+
+.repository-panel-header .repository-commit-count {
+    min-width: 1.8rem;
+    margin: 0;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: var(--ecu-purple-soft);
+    color: var(--ecu-purple-dark);
+    font-weight: 700;
+    text-align: center;
+}
+
+.repository-commit-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.repository-commit-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1.25rem;
+    border-bottom: 1px solid var(--colorNeutralStroke1);
+}
+
+.repository-commit-list li:last-child {
+    border-bottom: 0;
+}
+
+.repository-commit-main {
+    min-width: 0;
+}
+
+.repository-commit-main strong {
+    display: block;
+    overflow: hidden;
+    font-size: 0.92rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.repository-commit-main span {
+    display: block;
+    margin-top: 0.15rem;
+    color: var(--colorNeutralForeground2);
+    font-size: 0.8rem;
+}
+
+.repository-commit-list code {
+    flex: 0 0 auto;
+    padding: 0.2rem 0.45rem;
+    border-radius: 4px;
+    background: var(--colorNeutralBackground2);
+    color: var(--ecu-purple-dark);
+    font-size: 0.78rem;
+}
+
+.repository-empty {
+    padding: 1.5rem 1.25rem;
+    color: var(--colorNeutralForeground2);
+    text-align: center;
+}

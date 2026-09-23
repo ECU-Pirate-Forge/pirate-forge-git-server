@@ -9,8 +9,17 @@
 
 <PageTitle>Repository Templates</PageTitle>
 
-<h1>Repository Templates</h1>
-<p>Create bare Git repositories that can provide starter code for assignments.</p>
+<div class="page-header">
+    <div>
+        <h1>Repository Templates</h1>
+        <p>Create bare Git repositories that can provide starter code for assignments.</p>
+    </div>
+    <FluentAnchorButton Appearance="ButtonAppearance.Primary"
+                        Href="@(ShowCreateForm ? "/templates" : "/templates?action=create")"
+                        data-enhance-nav="false">
+        @(ShowCreateForm ? "Close form" : "Add template")
+    </FluentAnchorButton>
+</div>
 
 @if (!string.IsNullOrWhiteSpace(Created))
 {
@@ -26,31 +35,36 @@ else if (Error is not null)
     </FluentMessageBar>
 }
 
-<FluentCard>
-    <h2>Create template</h2>
-    <form method="post" action="/templates/create" class="course-form">
-        <AntiforgeryToken />
-        <FluentTextInput Name="Name"
-                         Label="Repository name"
-                         Required="true"
-                         Width="100%" />
-        <FluentTextInput Name="DisplayName"
-                         Label="Display name"
-                         Required="true"
-                         Width="100%" />
-        <FluentButton Type="ButtonType.Submit"
-                      Appearance="ButtonAppearance.Primary">
-            Create template
-        </FluentButton>
-    </form>
-</FluentCard>
+@if (ShowCreateForm)
+{
+    <FluentCard Class="form-panel">
+        <h2>Create template</h2>
+        <form method="post" action="/templates/create" class="course-form">
+            <AntiforgeryToken />
+            <FluentTextInput Name="Name"
+                             Label="Repository name"
+                             Required="true"
+                             Width="100%" />
+            <FluentTextInput Name="DisplayName"
+                             Label="Display name"
+                             Required="true"
+                             Width="100%" />
+            <FluentButton Type="ButtonType.Submit"
+                          Appearance="ButtonAppearance.Primary">
+                Create template
+            </FluentButton>
+        </form>
+    </FluentCard>
+}
 
 <RepositoryTemplateList Templates="@templates" />
 
 @code {
     [SupplyParameterFromQuery] private string? Created { get; set; }
     [SupplyParameterFromQuery] private string? Error { get; set; }
+    [SupplyParameterFromQuery(Name = "action")] private string? Action { get; set; }
     private IReadOnlyList<RepositoryTemplateResponse> templates = [];
+    private bool ShowCreateForm => Action == "create" || Error is not null;
 
     protected override async Task OnInitializedAsync()
     {

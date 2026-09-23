@@ -1,42 +1,75 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<FluentCard>
+<FluentCard Class="data-grid-card">
     @if (Events.Count == 0)
     {
-        <p>No repository downloads have been recorded.</p>
+        <div class="empty-state">No repository downloads have been recorded.</div>
     }
     else
     {
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>When</th>
-                    <th>User</th>
-                    <th>Download</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var auditEvent in Events)
-                {
-                    <tr>
-                        <td>@auditEvent.CreatedAt.ToString("g")</td>
-                        <td>
-                            @auditEvent.ActorDisplayName<br />
-                            @auditEvent.ActorEmail
-                        </td>
-                        <td>
-                            @(auditEvent.Action == "AssignmentArchiveDownloaded"
-                                ? "All assignment repositories"
-                                : auditEvent.RepositoryName ?? "Repository")
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter activity"
+                             Placeholder="Search user or download"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredEvents.Count event(s)</span>
+        </div>
+        @if (filteredEvents.Count == 0)
+        {
+            <div class="empty-state">No activity matches your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredEvents.AsQueryable()"
+                                TGridItem="CourseAuditEventResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <PropertyColumn Property="@(auditEvent => auditEvent.CreatedAt)"
+                                    Title="When"
+                                    Format="g"
+                                    Sortable="true"
+                                    IsDefaultSortColumn="true"
+                                    InitialSortDirection="DataGridSortDirection.Descending" />
+                    <TemplateColumn Title="User"
+                                    SortBy="@(GridSort<CourseAuditEventResponse>.ByAscending(auditEvent => auditEvent.ActorDisplayName))">
+                        <strong>@context.ActorDisplayName</strong>
+                        <div class="grid-secondary-text">@context.ActorEmail</div>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Download"
+                                    SortBy="@(GridSort<CourseAuditEventResponse>.ByAscending(auditEvent =>
+                                        auditEvent.Action == "AssignmentArchiveDownloaded"
+                                            ? "All assignment repositories"
+                                            : auditEvent.RepositoryName ?? "Repository"))">
+                        @GetDownloadLabel(context)
+                    </TemplateColumn>
+                </FluentDataGrid>
+            </div>
+        }
     }
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<CourseAuditEventResponse> Events { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<CourseAuditEventResponse> filteredEvents =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Events
+            : Events.Where(auditEvent =>
+                    auditEvent.ActorDisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || auditEvent.ActorEmail.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || GetDownloadLabel(auditEvent).Contains(
+                        filter,
+                        StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+    private static string GetDownloadLabel(CourseAuditEventResponse auditEvent) =>
+        auditEvent.Action == "AssignmentArchiveDownloaded"
+            ? "All assignment repositories"
+            : auditEvent.RepositoryName ?? "Repository";
 }

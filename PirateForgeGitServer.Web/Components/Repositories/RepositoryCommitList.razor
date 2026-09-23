@@ -1,20 +1,39 @@
 @using PirateForgeGitServer.Contracts.Git
 
-<FluentCard>
-    <h2>Recent commits</h2>
-    <ol class="commit-list">
-        @foreach (var commit in Commits)
-        {
-            <li>
-                <strong>@commit.Subject</strong>
-                <span>@commit.AuthorName · @commit.AuthoredAt.ToString("g")</span>
-                <code>@commit.Id[..Math.Min(8, commit.Id.Length)]</code>
-            </li>
-        }
-    </ol>
+<FluentCard Class="repository-panel repository-commits">
+    <div class="repository-panel-header">
+        <div>
+            <h2>Recent commits</h2>
+            <span>Latest changes on this branch</span>
+        </div>
+        <span class="repository-commit-count">@Commits.Count</span>
+    </div>
+
+    @if (Commits.Count == 0)
+    {
+        <div class="repository-empty">No commits are available.</div>
+    }
+    else
+    {
+        <ol class="repository-commit-list">
+            @foreach (var commit in Commits)
+            {
+                <li>
+                    <div class="repository-commit-main">
+                        <strong>@commit.Subject</strong>
+                        <span>@commit.AuthorName · @commit.AuthoredAt.ToString("MMM d, yyyy 'at' h:mm tt")</span>
+                    </div>
+                    <code title="@commit.Id">@ShortId(commit.Id)</code>
+                </li>
+            }
+        </ol>
+    }
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired]
     public required IReadOnlyList<RepositoryCommitResponse> Commits { get; set; }
+
+    private static string ShortId(string id) =>
+        id[..Math.Min(8, id.Length)];
 }

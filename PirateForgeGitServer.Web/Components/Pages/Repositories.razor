@@ -9,10 +9,14 @@
 
 <PageTitle>Repositories</PageTitle>
 
-<h1>Repositories</h1>
-<p>Browse course work by course and assignment.</p>
+<div class="page-header">
+    <div>
+        <h1>Repositories</h1>
+        <p>Browse course work by course and assignment.</p>
+    </div>
+</div>
 
-@if (courseGroups.Count == 0)
+@if (rows.Count == 0)
 {
     <FluentMessageBar Intent="MessageBarIntent.Info">
         No repositories are available.
@@ -20,55 +24,24 @@
 }
 else
 {
-    @foreach (var courseGroup in courseGroups)
-    {
-        <FluentCard>
-            <h2>
-                <FluentLink Href="@($"/courses/{courseGroup.Course.Id}")">
-                    @courseGroup.Course.Code · @courseGroup.Course.Name
-                </FluentLink>
-            </h2>
-
-            @if (courseGroup.Assignments.Count == 0)
-            {
-                <p>No assignments have been created for this course yet.</p>
-            }
-            else
-            {
-                @foreach (var assignment in courseGroup.Assignments)
-                {
-                    <article>
-                        <h3>
-                            <FluentLink Href="@($"/courses/{courseGroup.Course.Id}/assignments/{assignment.Id}/repositories")">
-                                @assignment.Title
-                            </FluentLink>
-                        </h3>
-                        <p><code>@assignment.Slug</code></p>
-                    </article>
-                }
-            }
-        </FluentCard>
-    }
+    <CourseRepositoryList Rows="@rows" />
 }
 
 @code {
-    private IReadOnlyList<CourseRepositoryGroup> courseGroups = [];
+    private IReadOnlyList<CourseRepositoryRow> rows = [];
 
     protected override async Task OnInitializedAsync()
     {
         var courses = await CourseApi.ListAsync();
-        var groups = new List<CourseRepositoryGroup>();
+        var repositoryRows = new List<CourseRepositoryRow>();
 
         foreach (var course in courses)
         {
             var assignments = await AssignmentApi.ListAssignmentsAsync(course.Id);
-            groups.Add(new CourseRepositoryGroup(course, assignments));
+            repositoryRows.AddRange(assignments.Select(
+                assignment => new CourseRepositoryRow(course, assignment)));
         }
 
-        courseGroups = groups;
+        rows = repositoryRows;
     }
-
-    private sealed record CourseRepositoryGroup(
-        CourseResponse Course,
-        IReadOnlyList<AssignmentResponse> Assignments);
 }

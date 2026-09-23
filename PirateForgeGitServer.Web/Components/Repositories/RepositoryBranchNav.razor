@@ -1,23 +1,13 @@
 @using PirateForgeGitServer.Contracts.Git
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
 
-<nav aria-label="Repository branches">
-    @* <span>Branch:</span>
-    @foreach (var branch in Branches)
-    {
-        <FluentButton Appearance="@(branch.Name == SelectedBranch
-                                      ? ButtonAppearance.Primary
-                                      : ButtonAppearance.Outline)"
-                      Href="@($"/repositories/{RepositoryName}?branch={Uri.EscapeDataString(branch.Name)}")">
-                      
-            @branch.Name
-        </FluentButton>
-    } *@
-
-    <span>Branch:</span>
-    <FluentSelect Label=""
-                TOption="RepositoryBranchResponse"
-                TValue="string"
-                @bind-Value="@SelectedBranch">
+<div class="repository-branch-picker">
+    <FluentSelect Label="Branch"
+                  TOption="RepositoryBranchResponse"
+                  TValue="string"
+                  @bind-Value="selectedBranch"
+                  @bind-Value:after="NavigateToBranch">
         @foreach (var branch in Branches)
         {
             <FluentOption TValue="string" Value="@branch.Name">
@@ -25,8 +15,7 @@
             </FluentOption>
         }
     </FluentSelect>
-
-</nav>
+</div>
 
 @code {
     [Parameter, EditorRequired]
@@ -37,4 +26,24 @@
 
     [Parameter, EditorRequired]
     public required string SelectedBranch { get; set; }
+
+    private string selectedBranch = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        selectedBranch = SelectedBranch;
+    }
+
+    private void NavigateToBranch()
+    {
+        if (string.IsNullOrWhiteSpace(selectedBranch)
+            || string.Equals(selectedBranch, SelectedBranch, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        Navigation.NavigateTo(
+            $"/repositories/{RepositoryName}?branch={Uri.EscapeDataString(selectedBranch)}",
+            forceLoad: true);
+    }
 }

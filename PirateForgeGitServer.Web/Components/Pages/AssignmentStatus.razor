@@ -19,18 +19,22 @@
 }
 else
 {
-    <p>
+    <nav class="breadcrumb" aria-label="Breadcrumb">
         <FluentLink Href="@($"/courses/{CourseId}")">Course</FluentLink>
-        / @status.Slug
-    </p>
-    <h1>@status.Title repositories</h1>
-    <p>
+        <span aria-hidden="true">/</span>
+        <span>@status.Slug</span>
+    </nav>
+    <div class="page-header">
+        <div>
+            <h1>@status.Title repositories</h1>
+            <p>Review provisioning and the latest student work.</p>
+        </div>
         <FluentAnchorButton Appearance="ButtonAppearance.Primary"
                             Href="@($"/courses/{CourseId}/assignments/{AssignmentId}/download")"
                             data-enhance-nav="false">
             Download all repositories
         </FluentAnchorButton>
-    </p>
+    </div>
     <AssignmentStatusTable Status="@status" />
 }
 

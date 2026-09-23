@@ -1,39 +1,79 @@
-@using PirateForgeGitServer.Contracts.Courses
+﻿@using PirateForgeGitServer.Contracts.Courses
+@rendermode InteractiveServer
 
-<FluentCard>
-    <table class="course-staff-table">
-        <thead>
-            <tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr>
-        </thead>
-        <tbody>
-            @foreach (var member in Staff)
-            {
-                <tr>
-                    <td>@member.DisplayName</td>
-                    <td>@member.Email</td>
-                    <td>@member.Role</td>
-                    <td>
-                        @if (CanManage)
-                        {
+<FluentCard Class="data-grid-card">
+    @if (Staff.Count == 0)
+    {
+        <div class="empty-state">No staff members are assigned to this course.</div>
+    }
+    else
+    {
+        <div class="grid-toolbar">
+            <FluentTextInput @bind-Value="filter"
+                             Label="Filter course staff"
+                             Placeholder="Search name, email, or role"
+                             Type="TextInputType.Search"
+                             Immediate="true"
+                             ImmediateDelay="150" />
+            <span class="grid-count">@filteredStaff.Count staff member(s)</span>
+        </div>
+        @if (filteredStaff.Count == 0)
+        {
+            <div class="empty-state">No staff members match your filter.</div>
+        }
+        else
+        {
+            <div class="data-grid-scroll">
+                <FluentDataGrid Items="@filteredStaff.AsQueryable()"
+                                TGridItem="CourseStaffResponse"
+                                ResizableColumns="true"
+                                ShowHover="true">
+                    <PropertyColumn Property="@(member => member.DisplayName)"
+                                    Title="Name"
+                                    Sortable="true"
+                                    IsDefaultSortColumn="true" />
+                    <PropertyColumn Property="@(member => member.Email)"
+                                    Title="Email"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(member => member.Role)"
+                                    Title="Role"
+                                    Sortable="true" />
+                    <PropertyColumn Property="@(member => member.AddedAt)"
+                                    Title="Added"
+                                    Format="d"
+                                    Sortable="true" />
+                    @if (CanManage)
+                    {
+                        <TemplateColumn Title="Actions">
                             <form method="post"
                                   action="@($"/courses/{CourseId}/staff/remove")">
                                 <AntiforgeryToken />
-                                <input type="hidden" name="UserId" value="@member.UserId" />
+                                <input type="hidden" name="UserId" value="@context.UserId" />
                                 <FluentButton Type="ButtonType.Submit"
                                               Appearance="ButtonAppearance.Outline">
                                     Remove
                                 </FluentButton>
                             </form>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                        </TemplateColumn>
+                    }
+                </FluentDataGrid>
+            </div>
+        }
+    }
 </FluentCard>
 
 @code {
     [Parameter, EditorRequired] public required Guid CourseId { get; set; }
     [Parameter, EditorRequired] public required IReadOnlyList<CourseStaffResponse> Staff { get; set; }
     [Parameter] public bool CanManage { get; set; }
+
+    private string? filter;
+    private IReadOnlyList<CourseStaffResponse> filteredStaff =>
+        string.IsNullOrWhiteSpace(filter)
+            ? Staff
+            : Staff.Where(member =>
+                    member.DisplayName.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || member.Email.Contains(filter, StringComparison.OrdinalIgnoreCase)
+                    || member.Role.Contains(filter, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 }
